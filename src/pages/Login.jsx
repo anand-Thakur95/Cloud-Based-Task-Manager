@@ -1,7 +1,21 @@
-import React from 'react'
-
+import React, { useEffect } from 'react'
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 function Login() {
 
+  const user = "";
+  const {register, handleSubmit, formState: {errors}} = useForm();
+
+  const navigate = useNavigate();
+
+
+  const submitHandler = async (data) => {
+    console.log(data);
+  }
+
+  useEffect(() => {
+    user && navigate("/dashboard");
+  }, [user, navigate]);
 
   return (
     <div className='w-full min-h-screen flex items-center justify-center flex-col lg:flex-row bg-[#f3f4f6] dark:bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-[#302943] via-slate-900 to-black py-4 sm:py-6 lg:py-0'>
@@ -26,17 +40,19 @@ function Login() {
         {/* Right Section - Login Form */}
         <div className='w-full lg:w-1/2 xl:w-1/3 flex flex-col justify-center items-center order-1 lg:order-2'>
           <form
-          
+          onSubmit={handleSubmit(submitHandler)}
           className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-[400px] flex flex-col gap-y-6 sm:gap-y-8 bg-white dark:bg-slate-900 px-6 sm:px-8 md:px-10 pt-8 sm:pt-12 md:pt-14 pb-8 sm:pb-12 md:pb-14 rounded-lg sm:rounded-xl shadow-lg">
             <p className='text-blue-600 text-center font-bold text-2xl sm:text-3xl'>Welcome Back</p>
             <p className='text-center text-sm sm:text-base text-gray-700 dark:text-gray-500'>
               Keep all your credentials safe!
             </p>
             <div className='flex flex-col gap-y-4 sm:gap-y-5'>
+   
               <input 
                 name='email'
                 type='email'
                 placeholder='Enter email...'
+                {...register("email", {required: "Email is required"})}
                 className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
               />
 
@@ -44,8 +60,16 @@ function Login() {
                 name='password'
                 placeholder='Enter password...'
                 type='password'
+                  {...register("password", {required: "Password is required"})}
                 className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
               />
+           
+           <span
+            className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
+                Forget Password?
+        
+             
+             </span>
             </div>
             <button 
               type='submit'
