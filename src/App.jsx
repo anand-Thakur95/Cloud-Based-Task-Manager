@@ -1,6 +1,7 @@
 import React from 'react'
 import './App.css'
 import { Navigate, Route, Routes, useLocation, Outlet } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import Login from './pages/Login'
 import Tasks from './pages/Tasks'
 import TaskDetails from './pages/TaskDetails'
@@ -11,9 +12,7 @@ import Users from './pages/Users'
 
 
 function Layout(){
- 
-  const user = ""
-
+  const { user } = useSelector((state) => state.auth);
   const location = useLocation()
 
   return user ? (
@@ -41,7 +40,7 @@ function App() {
   return (
    <Routes>
     <Route element={<Layout />}>
-      <Route path='/' element={<Navigate to="/dashboard" />}/>
+      <Route index element={<Navigate to="/dashboard" replace />}/>
       <Route path='/dashboard' element={<Dashboard/>}/>
       <Route path='/tasks' element={<Tasks/>}/>
       <Route path='/completed/:status' element={<Tasks/>}/>

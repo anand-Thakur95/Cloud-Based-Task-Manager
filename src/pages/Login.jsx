@@ -1,30 +1,31 @@
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { dispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/slices/authSlice';
+
 function Login() {
   const dispatch = useDispatch();
-
-  const {user} = useSelector((state) => state.auth);
-  const {register, handleSubmit, formState: {errors}} = useForm();
-
   const navigate = useNavigate();
-
+  const {user} = useSelector((state) => state.auth);
+  const {register, handleSubmit} = useForm();
 
   const submitHandler = async (data) => {
     try {
-      localStorage.setItem("userInfo", JSON.stringify(data));
+      // Dispatch to update Redux state (this also saves to localStorage via authSlice)
       dispatch(setCredentials(data));
+      navigate("/dashboard", { replace: true });
     } catch (error) {
       console.log(error);
     }
   }
 console.log(user);
 
+  // Redirect if user is already logged in
   useEffect(() => {
-    user && navigate("/dashboard");
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
   }, [user, navigate]);
 
   return (
