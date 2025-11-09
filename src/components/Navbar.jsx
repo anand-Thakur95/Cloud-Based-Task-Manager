@@ -19,10 +19,10 @@ export function Navbar() {
   }
 
   return (
-    <nav className="w-full border-b bg-white dark:bg-slate-900">
+    <nav className=" fixed top-0 left-0 right-0 z-50 flex justify-center items-center w-full border-b bg-white dark:bg-slate-900">
       <div className="flex items-center justify-between px-1 py-3 md:px-2">
         <div className="flex items-center gap-6">
-          <Link to="/dashboard" className="text-xl font-bold text-blue-600 dark:text-blue-400">
+          <Link to="/dashboard" className="text-xl left-0 font-bold text-blue-600 dark:text-blue-400">
             Task Manager
           </Link>
           
