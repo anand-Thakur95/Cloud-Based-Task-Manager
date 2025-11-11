@@ -1,4 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { MdDashboard } from "react-icons/md";
 
 import {
   Sidebar,
@@ -43,8 +44,9 @@ export function  AppSidebar() {
         return (
             <SidebarProvider>
           <Sidebar className= "flex left-0 right-0  top-15">
-            <SidebarHeader className= "text-2xl text-blue-500" >
-                task manager
+            <SidebarHeader className= " flex flex-row items-center text-2xl text-blue-500 gap-2" >
+            <MdDashboard />
+              <p className="font-bold">Task Manager</p>
             </SidebarHeader>
                   <SidebarMenu>
                     {items.map((item) => (
