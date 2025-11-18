@@ -7,7 +7,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarFooter
+ 
 } from "@/components/ui/sidebar";
 
 
@@ -25,8 +25,8 @@ export function AppSidebar() {
   
 
   return (
-    <SidebarProvider>
-      <Sidebar className="flex left-0 right-0 top-15">
+    
+      <Sidebar className="flex left-0 right-0 top-12">
         <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2">
           <MdDashboard />
           <p className="font-bold">Dashboard</p>
@@ -36,7 +36,6 @@ export function AppSidebar() {
           {items.map((item) => {
 
         
-
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
@@ -54,7 +53,7 @@ export function AppSidebar() {
         </SidebarMenu>
       
       </Sidebar>
-    </SidebarProvider>
+   
    
   );
 }
