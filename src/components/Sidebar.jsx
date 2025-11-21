@@ -1,24 +1,28 @@
-import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users } from "lucide-react";
+import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users,TableOfContents, Settings } from "lucide-react";
+
+
 import { MdDashboard } from "react-icons/md";
 import {
   Sidebar,
-  SidebarProvider,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
- 
+  SidebarFooter,
 } from "@/components/ui/sidebar";
+
 
 
 
 // Menu items
 const items = [
+  { title: "Tasks", url: "/dashbar", icon: TableOfContents },
   { title: "Complete", url: "/complete", icon: CircleCheckBig },
   { title: "In Process", url: "/in-process", icon: ClipboardClock },
   { title: "To Do", url: "/todo", icon: ClipboardCheck },
   { title: "Team", url: "/team", icon: Users },
   { title: "Trash", url: "/trash", icon: Trash2 },
+ 
 ];
 
 export function AppSidebar() {
@@ -26,7 +30,7 @@ export function AppSidebar() {
 
   return (
     
-      <Sidebar className="flex left-0 right-0 top-12">
+      <Sidebar className="flex left-0 right-0 top-13">
         <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2">
           <MdDashboard />
           <p className="font-bold">Dashboard</p>
@@ -51,7 +55,10 @@ export function AppSidebar() {
             );
           })}
         </SidebarMenu>
-      
+     <SidebarFooter className="absolute flex flex-row bottom-13  gap-1 ">
+      <Settings />
+      <span>Setting</span> 
+     </SidebarFooter>
       </Sidebar>
    
    
