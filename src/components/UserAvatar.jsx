@@ -34,7 +34,7 @@ function UserAvatar() {
         {/* Avatar Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg hover:shadow-lg transition-shadow duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg hover:shadow-lg transition-shadow duration-200 focus:outline-none"
         >
           JD
         </button>
