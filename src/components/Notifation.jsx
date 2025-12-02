@@ -47,7 +47,7 @@ export default function NotificationBar() {
               </button>
 
               {isNotifOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl py-2 z-10 border border-gray-200">
+                <div className="absolute min-[320px]:w-60 right-0 mt-2 w-80 bg-white rounded-lg shadow-xl py-2 z-10 border border-gray-200">
                   <div className="px-4 py-2 border-b border-gray-200">
                     <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
                   </div>

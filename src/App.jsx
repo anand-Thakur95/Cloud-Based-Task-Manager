@@ -19,7 +19,7 @@ function Layout() {
 
   return user ? (
     <SidebarProvider>
-      <div className='w-full h-screen fixed top-0 left-0 right-0 flex flex-col md:flex-row bg-gray-500 '>
+      <div className='w-full h-screen fixed top-0 left-0 right-0 flex flex-col md:flex-row '>
         {/* Sidebar - visible on mobile when toggled, always visible on desktop */}
         <AppSidebar />
 
