@@ -30,7 +30,7 @@ export function AppSidebar() {
 
   return (
     
-      <Sidebar className="flex left-0 right-0 top-13">
+      <Sidebar className="flex left-0 right-0 top-15">
         <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2">
           <MdDashboard />
           <p className="font-bold">Dashboard</p>
@@ -55,7 +55,7 @@ export function AppSidebar() {
             );
           })}
         </SidebarMenu>
-     <SidebarFooter className="absolute flex flex-row bottom-13  gap-1 ">
+     <SidebarFooter className="absolute flex flex-row bottom-17  gap-1 ">
       <Settings />
       <span>Setting</span> 
      </SidebarFooter>

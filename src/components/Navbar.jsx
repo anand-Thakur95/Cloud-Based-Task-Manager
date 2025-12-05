@@ -33,7 +33,7 @@ function Navbar() {
     </div>
 
     {/* CENTER - SEARCH */}
-    <div className=" 2xl:w-[400px] lg:w-2xl md:w-76  min-[320px]:w-40 min-[425px]:w-60 flex items-center py-2 px-3 gap-2 rounded-full bg-gray-300">
+    <div className=" 2xl:w-[400px] lg:w-2xl md:w-76  min-[320px]:w-40 min-[425px]:w-60 flex items-center py-2 px-3 gap-2 rounded-full bg-gray-100">
       <Search />
       <input
         type="text"
