@@ -10,8 +10,12 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
+import { Chart } from "../components/Chart";
+import { chartdata, summary } from "../assets/data";
 
 function Dashboard() {
+const totals = summary.tasks
+
   const stats = [
     {
       _id: "1",
@@ -69,9 +73,22 @@ function Dashboard() {
           <Card key={index} icon={icon} bg={bg} label={label} count={total} />
         ))}
       </div>
-      
+
       <div className="w-full bg-white my-16 p-4 rounded shadow-sm">
         <h4 className="text-lg font-bold">Chart by Priority</h4>
+        <Chart data={chartdata} />
+      </div>
+
+      <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
+        {/* left  */}
+        <div>
+
+        </div>
+
+        {/* right */}
+        <div>
+
+        </div>
       </div>
     </div>
   );
