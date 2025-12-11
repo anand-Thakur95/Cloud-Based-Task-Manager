@@ -13,35 +13,67 @@ import {
 import { Chart } from "../components/Chart";
 import { chartdata, summary } from "../assets/data";
 
+const TaskTable = ({ tasks = [] }) => {
+  const ICONS = {
+    high: <MdKeyboardArrowUp />,
+    medium: <MdKeyboardArrowUp />,
+    low: <MdKeyboardArrowDown />,
+  };
+
+  const TableHeader = () => (
+    <thead className="border-gray-300">
+      <tr className="text-black text-left">
+        <th className="py-2">Task Title</th>
+        <th className="py-2">Priority</th>
+        <th className="py-2">Stage</th>
+        <th className="py-2 hidden md:block">Created At</th>
+      </tr>
+    </thead>
+  );
+
+  
+
+  return (
+    <div className="w-full bg-white px-2 md:px-4 pb-4 shadow-md rounded">
+      <table className="w-full">
+        <TableHeader />
+        <tbody>
+        
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 function Dashboard() {
-const totals = summary.tasks
+  const totals = summary.tasks;
 
   const stats = [
     {
       _id: "1",
       label: "TOTAL TASK",
-      total: 10,
+      total: summary.totalTasks,
       icon: <FaNewspaper />,
       bg: "bg-[#1d4ed8]",
     },
     {
       _id: "2",
       label: "COMPLTED TASK",
-      total: 3,
+      total: totals.completed,
       icon: <MdAdminPanelSettings />,
       bg: "bg-[#0f766e]",
     },
     {
       _id: "3",
       label: "TASK IN PROGRESS ",
-      total: 2,
+      total: totals["in progress"],
       icon: <LuClipboardPen />,
       bg: "bg-[#f59e0b]",
     },
     {
       _id: "4",
       label: "TODOS",
-      total: 1,
+      total: totals.todo,
       icon: <FaArrowsToDot />,
       bg: "bg-[#be185d]",
     },
@@ -81,9 +113,7 @@ const totals = summary.tasks
 
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
         {/* left  */}
-        <div>
-
-        </div>
+        <TaskTable tasks={summary.last10Task} />
 
         {/* right */}
         <div>

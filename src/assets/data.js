@@ -7,6 +7,7 @@ export const summary = {
             priority: "high",
             stage: "todo",
             date: "2024-01-15",
+            team: "Design Team",
         },
         {
             _id: "2",
@@ -14,6 +15,7 @@ export const summary = {
             priority: "high",
             stage: "in progress",
             date: "2024-01-14",
+            team: "Backend Team",
         },
         {
             _id: "3",
@@ -21,6 +23,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-16",
+            team: "Documentation Team",
         },
         {
             _id: "4",
@@ -28,6 +31,7 @@ export const summary = {
             priority: "medium",
             stage: "in progress",
             date: "2024-01-13",
+            team: "Frontend Team",
         },
         {
             _id: "5",
@@ -35,6 +39,7 @@ export const summary = {
             priority: "low",
             stage: "completed",
             date: "2024-01-12",
+            team: "DevOps Team",
         },
         {
             _id: "6",
@@ -42,6 +47,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-17",
+            team: "Frontend Team",
         },
         {
             _id: "7",
@@ -49,6 +55,7 @@ export const summary = {
             priority: "high",
             stage: "in progress",
             date: "2024-01-11",
+            team: "Backend Team",
         },
         {
             _id: "8",
@@ -56,6 +63,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-18",
+            team: "Backend Team",
         },
         {
             _id: "9",
@@ -63,6 +71,7 @@ export const summary = {
             priority: "low",
             stage: "todo",
             date: "2024-01-19",
+            team: "QA Team",
         },
         {
             _id: "10",
@@ -70,6 +79,7 @@ export const summary = {
             priority: "high",
             stage: "todo",
             date: "2024-01-20",
+            team: "DevOps Team",
         },
     ],
     tasks: {
