@@ -15,9 +15,21 @@ import { chartdata, summary } from "../assets/data";
 
 const TaskTable = ({ tasks = [] }) => {
   const ICONS = {
-    high: <MdKeyboardArrowUp />,
+    high: <MdKeyboardDoubleArrowUp />,
     medium: <MdKeyboardArrowUp />,
     low: <MdKeyboardArrowDown />,
+  };
+
+  const PRIORITY_COLORS = {
+    high: "text-red-500",
+    medium: "text-yellow-500",
+    low: "text-blue-500",
+  };
+
+  const STAGE_COLORS = {
+    todo: "bg-gray-400",
+    "in progress": "bg-blue-400",
+    completed: "bg-green-500",
   };
 
   const TableHeader = () => (
@@ -31,14 +43,39 @@ const TaskTable = ({ tasks = [] }) => {
     </thead>
   );
 
-  
+  const TableRow = ({ task }) => (
+    <tr className="border-b border-gray-300 text-gray-600 hover:bg-gray-300/10">
+      <td className="py-2">
+        <div className="flex items-center gap-2">
+          <div
+            className={clsx("w-4 h-4 rounded-full", STAGE_COLORS[task.stage])}
+          ></div>
+          <span className="font-medium">{task.title}</span>
+        </div>
+      </td>
+      <td className="py-2">
+        <div className="flex items-center gap-1">
+          <span className={clsx(PRIORITY_COLORS[task.priority])}>
+            {ICONS[task.priority]}
+          </span>
+          <span className="capitalize">{task.priority}</span>
+        </div>
+      </td>
+      <td className="py-2">
+        <span className="capitalize">{task.stage}</span>
+      </td>
+      <td className="py-2 hidden md:block">{task.date}</td>
+    </tr>
+  );
 
   return (
     <div className="w-full bg-white px-2 md:px-4 pb-4 shadow-md rounded">
       <table className="w-full">
         <TableHeader />
         <tbody>
-        
+          {tasks?.map((task, id) => (
+            <TableRow key={task._id || id} task={task} />
+          ))}
         </tbody>
       </table>
     </div>
@@ -113,7 +150,7 @@ function Dashboard() {
 
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
         {/* left  */}
-        <TaskTable tasks={summary.last10Task} />
+        <TaskTable tasks={summary?.last10Task} />
 
         {/* right */}
         <div>
