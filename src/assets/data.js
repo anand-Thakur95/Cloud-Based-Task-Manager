@@ -7,7 +7,7 @@ export const summary = {
             priority: "high",
             stage: "todo",
             date: "2024-01-15",
-            team: "Design Team",
+            team: ["Sarah Johnson", "Mike Chen", "Emily Davis"],
         },
         {
             _id: "2",
@@ -15,7 +15,7 @@ export const summary = {
             priority: "high",
             stage: "in progress",
             date: "2024-01-14",
-            team: "Backend Team",
+            team: ["David Brown", "Lisa Wang"],
         },
         {
             _id: "3",
@@ -23,7 +23,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-16",
-            team: "Documentation Team",
+            team: ["Robert Taylor", "Jennifer Lee", "Chris Martinez"],
         },
         {
             _id: "4",
@@ -31,7 +31,7 @@ export const summary = {
             priority: "medium",
             stage: "in progress",
             date: "2024-01-13",
-            team: "Frontend Team",
+            team: ["Alex Thompson", "Maria Garcia"],
         },
         {
             _id: "5",
@@ -39,7 +39,7 @@ export const summary = {
             priority: "low",
             stage: "completed",
             date: "2024-01-12",
-            team: "DevOps Team",
+            team: ["James Wilson", "Amy Anderson"],
         },
         {
             _id: "6",
@@ -47,7 +47,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-17",
-            team: "Frontend Team",
+            team: ["Alex Thompson", "Sarah Johnson", "Mike Chen"],
         },
         {
             _id: "7",
@@ -55,7 +55,7 @@ export const summary = {
             priority: "high",
             stage: "in progress",
             date: "2024-01-11",
-            team: "Backend Team",
+            team: ["David Brown", "Chris Martinez"],
         },
         {
             _id: "8",
@@ -63,7 +63,7 @@ export const summary = {
             priority: "medium",
             stage: "todo",
             date: "2024-01-18",
-            team: "Backend Team",
+            team: ["David Brown", "Lisa Wang", "Robert Taylor"],
         },
         {
             _id: "9",
@@ -71,7 +71,7 @@ export const summary = {
             priority: "low",
             stage: "todo",
             date: "2024-01-19",
-            team: "QA Team",
+            team: ["Jennifer Lee"],
         },
         {
             _id: "10",
@@ -79,7 +79,7 @@ export const summary = {
             priority: "high",
             stage: "todo",
             date: "2024-01-20",
-            team: "DevOps Team",
+            team: ["James Wilson", "Amy Anderson", "Maria Garcia"],
         },
     ],
     tasks: {
