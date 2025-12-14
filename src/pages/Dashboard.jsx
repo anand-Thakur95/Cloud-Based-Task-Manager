@@ -1,5 +1,6 @@
 import React from "react";
 import { clsx } from "clsx";
+import moment from "moment";
 import { FaNewspaper } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
 import { LuClipboardPen } from "react-icons/lu";
@@ -114,7 +115,7 @@ const TaskTable = ({ tasks = [] }) => {
               )}
         </div>
       </td>
-      <td className="py-2 hidden md:block">{task.date}</td>
+      <td className="py-2 hidden md:block">{moment(task?.date).fromNow()}</td>
     </tr>
   );
 
@@ -171,7 +172,7 @@ function Dashboard() {
         <div className="h-full flex flex-1 flex-col items-start justify-between">
           <p className="text-sm text-gray-500">{label}</p>
           <span className="text-2xl font-bold">{count}</span>
-          <span className="text-sm text-gray-500">{"129 last month"}</span>
+          <span className="text-sm text-gray-500">{"129 days"}</span>
         </div>
 
         <div
