@@ -205,7 +205,7 @@ function Dashboard() {
 
         {/* right */}
         <div>
-        
+        <UserTable users={summary.users} />
         </div>
       </div>
     </div>
