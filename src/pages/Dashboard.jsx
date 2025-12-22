@@ -12,7 +12,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { Chart } from "../components/Chart";
-import { chartdata, summary } from "../assets/data";
+import {summary} from "../assets/data.js"
 import UserInfo from "../components/UserInfo";
 
 const TaskTable = ({ tasks = [] }) => {
@@ -196,7 +196,7 @@ function Dashboard() {
 
       <div className="w-full bg-white my-16 p-4 rounded shadow-sm">
         <h4 className="text-lg font-bold">Chart by Priority</h4>
-        <Chart data={chartdata} />
+        <Chart/>
       </div>
 
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
@@ -205,7 +205,7 @@ function Dashboard() {
 
         {/* right */}
         <div>
-        <UserTable users={summary.users} />
+        
         </div>
       </div>
     </div>
