@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 
 import Login from './pages/Login';
