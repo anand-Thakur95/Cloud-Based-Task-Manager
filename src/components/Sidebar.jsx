@@ -16,7 +16,7 @@ import {
 
 // Menu items
 const items = [
-  { title: "Tasks", url: "/dashbar", icon: TableOfContents },
+  { title: "Tasks", url: "/tasks", icon: TableOfContents },
   { title: "Complete", url: "/complete", icon: CircleCheckBig },
   { title: "In Process", url: "/in-process", icon: ClipboardClock },
   { title: "To Do", url: "/todo", icon: ClipboardCheck },
