@@ -1,10 +1,15 @@
 import React, { useState } from 'react'
 import { FaList } from 'react-icons/fa'
+import { IoMdAdd } from 'react-icons/io';
+
+
 import { MdGridView } from 'react-icons/md'
 import Loading from '../components/Loading.jsx';
 import { useParams } from 'react-router-dom';
-import { Button } from '@headlessui/react';
-import Title from '../components/Title.jsx';
+
+import Title from "../components/Title.jsx"
+import {Button } from "../components/ui/button.jsx"
+
 
 
 
@@ -32,7 +37,7 @@ const Tasks = () => {
       <Loading />
     </div>
   ) : (
-    <div className='w-full'>
+    <div className='w-full py-20'>
       <div className='flex items-center justify-between mb-4'>
         <Title title={status ? `${status} Tasks` : "Tasks"} />
 
@@ -42,34 +47,16 @@ const Tasks = () => {
             label='Create Task'
             icon={<IoMdAdd className='text-lg' />}
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md py-2 2xl:py-2.5'
-          />
+          >Create Task</Button>
         )}
       </div>
 
-      <Tabs tabs={TABS} setSelected={setSelected}>
-        {!status && (
-          <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4'>
-            <TaskTitle label='To Do' className={TASK_TYPE.todo} />
-            <TaskTitle
-              label='In Progress'
-              className={TASK_TYPE["in progress"]}
-            />
-            <TaskTitle label='completed' className={TASK_TYPE.completed} />
-          </div>
-        )}
-
-        {selected !== 1 ? (
-          <BoardView tasks={tasks} />
-        ) : (
-          <div className='w-full'>
-            <Table tasks={tasks} />
-          </div>
-        )}
-      </Tabs>
-
-      <AddTask open={open} setOpen={setOpen} />
-    </div>
-  );
-};
-
+{/* Tabs  */}
+<div>
+ 
+</div>
+   
+</div>
+  )
+}
 export default Tasks;
