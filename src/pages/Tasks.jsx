@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom';
 import Title from "../components/Title.jsx"
 import {Button } from "../components/ui/button.jsx"
 import Tabs from '../components/Tabs.jsx';
+import TaskTitle from '../components/TaskTitle.jsx';
 
 
 
@@ -21,8 +22,8 @@ const TABS = [
 
 const TASK_TYPE = {
   todo: "bg-blue-600",
-  "in process": "bg-yellow-600",
-  comleted: "bg-green-600",
+  "In Progress": "bg-yellow-600",
+  completed: "bg-green-600",
 };
 const Tasks = () => {
   const params = useParams();
@@ -55,11 +56,15 @@ const Tasks = () => {
 {/* Tabs  */}
 <div>
 <Tabs tabs={TABS}  setSelected={setSelected}>
-  {
-    !status && (
-      <Button></Button>
-    )
-  }
+ {
+  !status && (
+    <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4 rounded-md'>
+      <TaskTitle label="To Do" className={TASK_TYPE.todo} />
+      <TaskTitle label="In Progress" className={TASK_TYPE["In Progress"]} />
+      <TaskTitle label="Completed" className={TASK_TYPE.completed} />
+
+    </div>
+ )}
 
 </Tabs>
  

@@ -35,9 +35,9 @@ const Tabs = ({ tabs, setSelected, children }) => {
           </button>
         ))}
       </div>
-      {/* <div className="mt-2" role="tabpanel">
+      <div className="mt-2" role="tabpanel">
         {children}
-      </div> */}
+      </div>
     </div>
   )
 }

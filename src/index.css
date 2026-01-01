@@ -4,7 +4,10 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+body {
+  background-color: #FAFAFA;
 
+}
 .cell {
   display: inline-block;
   width: 49%;
