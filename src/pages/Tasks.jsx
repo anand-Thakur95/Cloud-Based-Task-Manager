@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 
 import Title from "../components/Title.jsx"
 import {Button } from "../components/ui/button.jsx"
+import Tabs from '../components/Tabs.jsx';
 
 
 
@@ -53,6 +54,14 @@ const Tasks = () => {
 
 {/* Tabs  */}
 <div>
+<Tabs tabs={TABS}  setSelected={setSelected}>
+  {
+    !status && (
+      <Button></Button>
+    )
+  }
+
+</Tabs>
  
 </div>
    
