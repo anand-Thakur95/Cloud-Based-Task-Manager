@@ -11,6 +11,7 @@ import Title from "../components/Title.jsx"
 import {Button } from "../components/ui/button.jsx"
 import Tabs from '../components/Tabs.jsx';
 import TaskTitle from '../components/TaskTitle.jsx';
+import BoarderView from '../components/BoarderView.jsx';
 
 
 
@@ -25,7 +26,7 @@ const TASK_TYPE = {
   "In Progress": "bg-yellow-600",
   completed: "bg-green-600",
 };
-const Tasks = () => {
+const Tasks = ({tasks}) => {
   const params = useParams();
 
   const [selected, setSelected] = useState(0);
@@ -65,7 +66,7 @@ const Tasks = () => {
 
     </div>
  )}
-
+{selected === 0 ? <BoarderView tasks={tasks}/> : <div></div>}
 </Tabs>
  
 </div>
