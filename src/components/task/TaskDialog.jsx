@@ -2,8 +2,8 @@ import React from 'react'
 
 function TaskDialog() {
   return (
-    <div>
-      
+    <div className='relative inline-block text-left'>
+      TaskDialog
     </div>
   )
 }
