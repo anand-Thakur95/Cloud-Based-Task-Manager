@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
-import { MdKeyboardArrowDown, MdKeyboardArrowUp, MdKeyboardDoubleArrowUp } from 'react-icons/md';
+import { MdAttachFile, MdKeyboardArrowDown, MdKeyboardArrowUp, MdKeyboardDoubleArrowUp } from 'react-icons/md';
 import { useSelector } from "react-redux";
 import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../utils/index.js";
 import  TaskDialog from "./task/TaskDialog.jsx"
-
+import { BiMessageAltDetail } from "react-icons/bi";
+import { FaList } from 'react-icons/fa';
 
 const ICONS = {
     high: <MdKeyboardDoubleArrowUp />,
@@ -43,6 +44,29 @@ function TaskCard({ task }) {
             <span className='text-sm text-gray-600'>
               {formatDate(new Date(task?.date))}
             </span>
+
+        <div className='w-full border-t border-gray-200 my-2' />
+        <div className='flex items-center justify-between mb-2'>
+            <div className='flex items-center gap-3'>
+                <div className='flex gap-1 items-center text-sm text-gray-600'>
+                    <BiMessageAltDetail />
+                    <span>{task?.activities?.length}</span>
+
+                </div>
+                <div className='flex gap-1 items-center text-sm text-gray-600 '>
+              <MdAttachFile />
+              <span>{task?.assets?.length}</span>
+            </div>
+            <div className='flex gap-1 items-center text-sm text-gray-600 '>
+              <FaList />
+              <span>0/{task?.subTasks?.length}</span>
+            </div>
+
+            </div>
+        </div>
+
+        
+
         </div>
     );
     }
