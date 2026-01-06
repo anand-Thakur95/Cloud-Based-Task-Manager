@@ -12,9 +12,8 @@ const authSlice = createSlice({
     initialState: initailState,
     reducers: {
         setCredentials: (state, action) => {
-            state.user = action.payload;
-            localStorage.setItem("userInfo", JSON.stringify(action.payload));
-            
+            state.user = { ...action.payload, isAdmin: true }; // Assuming admin for testing
+            localStorage.setItem("userInfo", JSON.stringify(state.user));
             
         },
 
