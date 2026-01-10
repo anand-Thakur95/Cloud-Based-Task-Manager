@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import clsx from "clsx";
-import moment from "moment";
+// import moment from "moment";
 import { FaBug, FaTasks, FaThumbsUp, FaUser } from "react-icons/fa";
 import { GrInProgress } from "react-icons/gr";
 import {
@@ -13,12 +13,12 @@ import {
 } from "react-icons/md";
 import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { tasks } from "../assets/data";
-import Tabs from "../components/Tabs";
+import Tabs from "../components/Tabs"
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
-import Loading from "../components/Loader";
-import Button from "../components/Button";
+// import Loading from "../components/Loader";
+// import Button from "../components/Button";
 
 const assets = [
   "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -90,7 +90,7 @@ const TaskDetails = () => {
   const { id } = useParams();
 
   const [selected, setSelected] = useState(0);
-  const task = tasks[3];
+  const task = tasks[8];
 
   return (
     <div className='w-full flex flex-col gap-3 mb-4 overflow-y-hidden'>
@@ -228,4 +228,49 @@ const TaskDetails = () => {
   );
 };
 
+
+
+const Activities = ({activities, id}) => {
+
+  const [selected, setSelected] = useState(act_types[0]);
+  const [text, setText] = useState("")
+
+  const Card = ({item}) => {
+
+    return <div className='flex space-x-4'>
+<div className='flex flex-col items-center flex-shrink-0'>
+  <div className='w-10 h-10 flex items-center justify-center'>
+    {TASKTYPEICON[item?.type]}
+
+  </div>
+<div className='w-full flex items-center'>
+  <div className='w-0.5 bg-gray-300 h-full'></div>
+
+</div>
+<div className='flex flex-col gap-y-1 mb-8'>
+  <p className='font-semibold'>{item?.by?.name}</p>
+
+</div>
+</div>
+    </div>
+  }
+
+  return (
+    <div className='w-full flex gap-10 2xl:gap-20 min-h-screen px-10 py-8 bg-white shadow rounded-md justify-between overflow-y-auto'>
+
+      <div className='w-full md:w-1/2'>
+      <h4 className='text-gray-600 font-semibold text-lg mb-5'>Activities</h4>
+
+      <div className='w-full '>
+        {activities?.map((el, index)=> (
+<Card />
+
+        ))}
+      </div>
+
+      </div>
+    </div>
+
+  )
+}
 export default TaskDetails

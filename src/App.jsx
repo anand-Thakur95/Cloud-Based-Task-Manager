@@ -1,7 +1,6 @@
 import React from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-
 import Login from "./pages/Login";
 import Tasks from "./pages/Tasks";
 import TaskDetails from "./pages/TaskDetails";
@@ -51,7 +50,7 @@ function App() {
         <Route path="/complete" element={<Tasks />} />
         <Route path="/in-process" element={<Tasks />} />
         <Route path="/todo" element={<Tasks />} />
-        <Route path="/task/:id" element={<TaskDetails />} />
+        <Route path="/Details" element={<TaskDetails />} />
         <Route path="/trash" element={<Trash />} />
         <Route path="/team" element={<Users />} />
       </Route>
