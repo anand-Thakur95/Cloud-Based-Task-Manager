@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
 import clsx from "clsx";
-// import moment from "moment";
+import moment from "moment";
+import React, { useState } from "react";
 import { FaBug, FaTasks, FaThumbsUp, FaUser } from "react-icons/fa";
 import { GrInProgress } from "react-icons/gr";
 import {
@@ -15,10 +15,11 @@ import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
 // import { toast } from "sonner";
 import { tasks } from "../assets/data";
-import Tabs from "../components/Tabs"
+import Tabs from "../components/Tabs";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
-// import Loading from "../components/Loader";
-// import Button from "../components/Button";
+
+import { Button } from "../components/ui/button.jsx"
+import Loading from "../components/Loading.jsx";
 
 const assets = [
   "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -90,7 +91,7 @@ const TaskDetails = () => {
   const { id } = useParams();
 
   const [selected, setSelected] = useState(0);
-  const task = tasks[8];
+  const task = tasks[3];
 
   return (
     <div className='w-full flex flex-col gap-3 mb-4 overflow-y-hidden'>
@@ -228,49 +229,89 @@ const TaskDetails = () => {
   );
 };
 
-
-
-const Activities = ({activities, id}) => {
-
+const Activities = ({ activity, id }) => {
   const [selected, setSelected] = useState(act_types[0]);
-  const [text, setText] = useState("")
+  const [text, setText] = useState("");
+  const isLoading = false;
 
-  const Card = ({item}) => {
+  const handleSubmit = async () => {};
 
-    return <div className='flex space-x-4'>
-<div className='flex flex-col items-center flex-shrink-0'>
-  <div className='w-10 h-10 flex items-center justify-center'>
-    {TASKTYPEICON[item?.type]}
+  const Card = ({ item }) => {
+    return (
+      <div className='flex space-x-4'>
+        <div className='flex flex-col items-center flex-shrink-0'>
+          <div className='w-10 h-10 flex items-center justify-center'>
+            {TASKTYPEICON[item?.type]}
+          </div>
+          <div className='w-full flex items-center'>
+            <div className='w-0.5 bg-gray-300 h-full'></div>
+          </div>
+        </div>
 
-  </div>
-<div className='w-full flex items-center'>
-  <div className='w-0.5 bg-gray-300 h-full'></div>
-
-</div>
-<div className='flex flex-col gap-y-1 mb-8'>
-  <p className='font-semibold'>{item?.by?.name}</p>
-
-</div>
-</div>
-    </div>
-  }
+        <div className='flex flex-col gap-y-1 mb-8'>
+          <p className='font-semibold'>{item?.by?.name}</p>
+          <div className='text-gray-500 space-y-2'>
+            <span className='capitalize'>{item?.type}</span>
+            <span className='text-sm'>{moment(item?.date).fromNow()}</span>
+          </div>
+          <div className='text-gray-700'>{item?.activity}</div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className='w-full flex gap-10 2xl:gap-20 min-h-screen px-10 py-8 bg-white shadow rounded-md justify-between overflow-y-auto'>
-
       <div className='w-full md:w-1/2'>
-      <h4 className='text-gray-600 font-semibold text-lg mb-5'>Activities</h4>
+        <h4 className='text-gray-600 font-semibold text-lg mb-5'>Activities</h4>
 
-      <div className='w-full '>
-        {activities?.map((el, index)=> (
-<Card />
-
-        ))}
+        <div className='w-full'>
+          {activity?.map((el, index) => (
+            <Card
+              key={index}
+              item={el}
+              isConnected={index < activity.length - 1}
+            />
+          ))}
+        </div>
       </div>
 
+      <div className='w-full md:w-1/3'>
+        <h4 className='text-gray-600 font-semibold text-lg mb-5'>
+          Add Activity
+        </h4>
+        <div className='w-full flex flex-wrap gap-5'>
+          {act_types.map((item, index) => (
+            <div key={item} className='flex gap-2 items-center'>
+              <input
+                type='checkbox'
+                className='w-4 h-4'
+                checked={selected === item ? true : false}
+                onChange={(e) => setSelected(item)}
+              />
+              <p>{item}</p>
+            </div>
+          ))}
+          <textarea
+            rows={10}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder='Type ......'
+            className='bg-white w-full mt-10 border border-gray-300 outline-none p-4 rounded-md focus:ring-2 ring-blue-500'
+          ></textarea>
+          {isLoading ? (
+            <Loading />
+          ) : (
+            <Button
+              type='button'
+              label='Submit'
+              onClick={handleSubmit}
+              className='bg-blue-600 text-white rounded'
+            >Submit</Button>
+          )}
+        </div>
       </div>
     </div>
-
-  )
-}
-export default TaskDetails
+  );
+};
+export default TaskDetails;
