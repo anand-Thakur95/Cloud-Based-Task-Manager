@@ -8,7 +8,7 @@ const ModalWrapper = ({ open, setOpen, children }) => {
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as='div'
-        className='relative z-10 w-full'
+        className='relative z-50'
         initialFocus={cancelButtonRef}
         onClose={() => setOpen(false)}
       >
@@ -21,10 +21,10 @@ const ModalWrapper = ({ open, setOpen, children }) => {
           leaveFrom='opacity-100'
           leaveTo='opacity-0'
         >
-          <div className='fixed inset-0 bg-black bg-opacity-60 transition-opacity' />
+          <div className='fixed inset-0 bg-black/60 transition-opacity' />
         </Transition.Child>
 
-        <div className='fixed inset-0 z-10 w-screen overflow-y-auto'>
+        <div className='fixed inset-0 z-50 overflow-y-auto'>
           <div className='flex h-full items-center justify-center p-4 text-center sm:p-0'>
             <Transition.Child
               as={Fragment}

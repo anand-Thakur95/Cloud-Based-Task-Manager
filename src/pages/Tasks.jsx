@@ -11,6 +11,7 @@ import TaskTitle from '../components/TaskTitle.jsx';
 import BoarderView from '../components/BoardView.jsx';
 import { tasks } from "../assets/data";
 import Table from '../components/task/Table.jsx';
+import AddTask from '../components/task/AddTask.jsx';
 
 const TABS = [
   {title:"Board View", icon:<MdGridView/>},
@@ -27,7 +28,7 @@ const Tasks = () => {
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   const status = params?.status || "";
 
@@ -43,10 +44,11 @@ const Tasks = () => {
         {!status && (
           <Button
             onClick={() => setOpen(true)}
-            label='Create Task'
-            icon={<IoMdAdd className='text-lg' />}
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md py-2 2xl:py-2.5'
-          >Create Task</Button>
+          >
+            <span>Create Task</span>
+            <IoMdAdd className='text-lg' />
+          </Button>
         )}
       </div>
 
@@ -72,6 +74,8 @@ const Tasks = () => {
 </Tabs>
  
 </div>
+
+      <AddTask open={open} setOpen={setOpen} />
    
 </div>
   )
