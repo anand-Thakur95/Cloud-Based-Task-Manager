@@ -36,7 +36,7 @@ function AddTask({open , setOpen}) {
   return (
  <>
 <ModalWrapper open={open} setOpen={setOpen}>
-    <form onSubmit={handleSubmit(SubmitHandler)} className='w-full'>
+    <form onSubmit={handleSubmit(SubmitHandler)} className='w-full rounded-md'>
 <Dialog.Title
 as='h2'
 className='text-base sm:text-lg font-bold leading-6 text-gray-900 mb-4'
