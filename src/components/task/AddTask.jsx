@@ -3,11 +3,20 @@ import { useForm } from 'react-hook-form'
 import ModalWrapper from '../ModalWrapper'
 import { Dialog } from '@headlessui/react'
 import UserList from './UserList';
+import SelectList from '../SelectList';
+
+const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
+const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"]
+
+const uploadedFileURLs = [];
+
 
 function AddTask({open , setOpen}) {
     const task = "";
     const {register, handleSubmit, formState: {errors},} = useForm();
     const [team, setTeam] = useState(task?.team || []);
+    const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0])
+
 
     const SubmitHandler = () => {};
   return (
@@ -40,9 +49,20 @@ className='text-base font-bold leading-6 text-gray-900 mb-4'
     <UserList
     setTeam={setTeam}
     team={team}
-    >
-   
-    </UserList>
+    ></UserList>
+<div className='flex gap-4'>
+  <SelectList 
+  label="Task Stage"
+  list={LISTS}
+  selected= {stage}
+  setSelected={setStage}
+  />
+
+
+</div>
+
+
+
 </div>
 
     </form>
