@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
-import ModalWrapper from "../ModalWrapper";
+import ModalWrapper from "../components/ModalWrapper";
 import { Dialog } from "@headlessui/react";
-import Textbox from "../Textbox";
-import Button from "../Button";
+import Textbox from "../components/Textbox";
+import { Button} from "../components/ui/button"
 
 const AddSubTask = ({ open, setOpen, id }) => {
   const {
@@ -79,14 +79,14 @@ const AddSubTask = ({ open, setOpen, id }) => {
               type='submit'
               className='bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto'
               label='Add Task'
-            />
+            >Submit</Button>
 
             <Button
               type='button'
               className='bg-white border text-sm font-semibold text-gray-900 sm:w-auto'
               onClick={() => setOpen(false)}
               label='Cancel'
-            />
+            >Cancel</Button>
           </div>
         </form>
       </ModalWrapper>
