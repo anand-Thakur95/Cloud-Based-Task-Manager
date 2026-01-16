@@ -4,8 +4,8 @@ import { useSelector } from "react-redux";
 import ModalWrapper from "./ModalWrapper";
 import { Dialog } from "@headlessui/react";
 import Textbox from "./Textbox";
-import Loading from "./Loader";
-import Button from "./Button";
+import Loading from "./Loading";
+import {Button} from "../components/ui/button";
 
 const AddUser = ({ open, setOpen, userData }) => {
   let defaultValues = userData ?? {};
@@ -90,14 +90,14 @@ const AddUser = ({ open, setOpen, userData }) => {
                 type='submit'
                 className='bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto'
                 label='Submit'
-              />
+              >Submit</Button>
 
               <Button
                 type='button'
                 className='bg-white px-5 text-sm font-semibold text-gray-900 sm:w-auto'
                 onClick={() => setOpen(false)}
                 label='Cancel'
-              />
+              >Cancel</Button>
             </div>
           )}
         </form>

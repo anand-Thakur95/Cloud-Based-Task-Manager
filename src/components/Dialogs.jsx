@@ -50,15 +50,17 @@ export default function ConfirmatioDialog({
                   : "bg-red-600 hover:bg-red-500"
               )}
               onClick={onClick}
-              label={type === "restore" ? "Restore" : "Delete"}
-            />
+            >
+              {type === "restore" ? "Restore" : "Delete"}
+            </Button>
 
             <Button
               type='button'
               className='bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border'
               onClick={() => closeDialog()}
-              label='Cancel'
-            />
+            >
+              Cancel
+            </Button>
           </div>
         </div>
       </ModalWrapper>
@@ -93,15 +95,17 @@ export function UserAction({ open, setOpen, onClick = () => {} }) {
                 "bg-red-600 hover:bg-red-500"
               )}
               onClick={onClick}
-              label={"Yes"}
-            />
+            >
+              Yes
+            </Button>
 
             <Button
               type='button'
               className='bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border'
               onClick={() => closeDialog()}
-              label='No'
-            />
+            >
+              No
+            </Button>
           </div>
         </div>
       </ModalWrapper>

@@ -6,9 +6,10 @@ import { HiDuplicate } from "react-icons/hi";
 import { MdAdd, MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import AddTask from "./AddTask.jsx";
-// import AddSubTask from "./AddSub";
+
 import ConfirmatioDialog from "../Dialogs";
 import { Menu, Transition } from "@headlessui/react";
+import AddSubTask from "./AddSubTask.jsx";
 
 const TaskDialog = ({ task }) => {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,11 @@ const TaskDialog = ({ task }) => {
   const navigate = useNavigate();
 
   const duplicateHandler = () => {};
-  const deleteClicks = () => {};
+  const deleteClicks = (id) => {
+setSelected(id)
+setOpenDialog(true)
+
+  };
   const deleteHandler = () => {};
 
   const items = [

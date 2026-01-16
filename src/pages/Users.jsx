@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import Title from "../components/Title.jsx";
-import { Button } from "../components/ui/button";
+
 import { IoMdAdd } from "react-icons/io";
 import { summary } from "../assets/data.js";
 import { getInitials } from "../utils";
 import clsx from "clsx";
 import ConfirmatioDialog, { UserAction } from "../components/Dialogs.jsx";
-// import AddUser from "../components/AddUser";
+import AddUser from "../components/AddUser.jsx"
+import { Button } from "../components/ui/button.jsx";
 
 const Users = () => {
   const [openDialog, setOpenDialog] = useState(false);
@@ -116,12 +117,12 @@ const Users = () => {
         </div>
       </div>
 
-      {/* <AddUser
+      <AddUser
         open={open}
         setOpen={setOpen}
         userData={selected}
         key={new Date().getTime().toString()}
-      /> */}
+      />
 
       <ConfirmatioDialog
         open={openDialog}
