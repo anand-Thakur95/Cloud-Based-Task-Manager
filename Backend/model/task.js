@@ -1,4 +1,4 @@
-import { Schema} from "mongoose"
+import { mongoose,Schema} from "mongoose"
 
 const taskSchema = new Schema({
     title: {type: String, required: true},
@@ -36,7 +36,7 @@ const taskSchema = new Schema({
 },
     ],
 
-    assets: [string],
+    assets: [String],
     team: [{type: Schema.Types.ObjectId, ref: "User"}],
     isTrashed: {type: Boolean, default: false},   
 },
