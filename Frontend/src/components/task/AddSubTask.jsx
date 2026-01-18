@@ -15,16 +15,16 @@ const AddSubTask = ({ open, setOpen, id }) => {
   // const [addSbTask] = useCreateSubTaskMutation();
 
   const handleOnSubmit = async (data) => {
-    try {
-      const res = await addSbTask({ data, id }).unwrap();
-      toast.success(res.message);
-      setTimeout(() => {
-        setOpen(false);
-      }, 500);
-    } catch (err) {
-      console.log(err);
-      toast.error(err?.data?.message || err.error);
-    }
+    // try {
+    //   const res = await addSbTask({ data, id }).unwrap();
+    //   toast.success(res.message);
+    //   setTimeout(() => {
+    //     setOpen(false);
+    //   }, 500);
+    // } catch (err) {
+    //   console.log(err);
+    //   toast.error(err?.data?.message || err.error);
+    // }
   };
 
   return (
