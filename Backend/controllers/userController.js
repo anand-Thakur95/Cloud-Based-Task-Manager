@@ -8,55 +8,67 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, title, isAdmin } = req.body;
 
-    const userExist = await User.findOne({ email });
-
-    if (userExist) {
-      return res.status(400).json({ status: false, message: "User already exists" });
+    // 1️⃣ Validate required fields
+    if (!name || !email || !password || !role || !title) {
+      return res.status(400).json({
+        status: false,
+        message: "All fields are required",
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // 2️⃣ Check if user already exists
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+      return res.status(400).json({
+        status: false,
+        message: "User already exists",
+      });
+    }
 
+    // 3️⃣ Create user (password will be hashed by schema pre-save)
     const user = await User.create({
       name,
       email,
-      password: hashedPassword,
+      password,
       role,
       title,
-      isAdmin: isAdmin || false,
+      isAdmin: Boolean(isAdmin),
     });
 
-    if (user) {
-      // Create JWT token for admin users
-      if (user.isAdmin) {
-        const token = jwt.sign(
-          { userId: user._id },
-          process.env.JWT_SECRET,
-          { expiresIn: "1d" }
-        );
+    // 4️⃣ Generate JWT token (for ALL users)
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
-        });
-      }
+    // 5️⃣ Set cookie (DEV + PROD safe)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true in prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
-      user.password = undefined;
+    // 6️⃣ Remove password from response
+    user.password = undefined;
 
-      return res.status(201).json({
-        status: true,
-        message: "User registered successfully",
-        user,
-      });
-    } else {
-      return res.status(400).json({ status: false, message: "Invalid user data" });
-    }
+    // 7️⃣ Send response
+    return res.status(201).json({
+      status: true,
+      message: "User registered successfully",
+      user,
+    });
+
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ status: false, message: error.message });
+    console.error("Register Error:", error);
+    return res.status(500).json({
+      status: false,
+      message: "Server error",
+    });
   }
 };
+
 
 // Login User
 export const loginUser = async (req, res) => {
@@ -92,7 +104,7 @@ export const loginUser = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
+      maxAge: 24 * 60 * 60 * 1000, // 1 days
     });
 
 
