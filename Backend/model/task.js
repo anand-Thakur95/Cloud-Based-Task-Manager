@@ -3,11 +3,12 @@ import { mongoose,Schema} from "mongoose"
 const taskSchema = new Schema({
     title: {type: String, required: true},
     date: {type: Date, default: new Date()},
-    priority: {
-        type: String,
-        default: "normal",
-        enum: ["todo", "in progress", "complete"],
-
+  
+        priority: {
+            type: String,
+            enum: ["low", "normal", "high"], // ✅ FIX HERE
+            default: "normal",
+          
     },
     activities: {
       type : {
