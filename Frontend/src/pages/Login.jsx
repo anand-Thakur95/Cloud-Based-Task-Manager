@@ -3,24 +3,31 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/slices/authSlice';
-
+import { useLoginMutation } from '../redux/slices/api/authApiSlice';
+import { toast } from "react-hot-toast"
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useSelector((state) => state.auth);
   const {register, handleSubmit} = useForm();
 
+  const [login] = useLoginMutation()
+
+
   const submitHandler = async (data) => {
     try {
-      // Dispatch to update Redux state (this also saves to localStorage via authSlice)
-      dispatch(setCredentials(data));
-      navigate("/dashboard", { replace: true });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-console.log(user);
+      const result = await login(data).unwrap();
 
+      dispatch(setCredentials(result.user));
+      toast.success("Login successful");
+      navigate("/dashboard", { replace: true });
+  
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.data?.message || "Login failed");
+    }
+  };
+  
   // Redirect if user is already logged in
   useEffect(() => {
     if (user) {
