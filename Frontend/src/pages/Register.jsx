@@ -1,30 +1,31 @@
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/slices/authSlice';
-import { useLoginMutation } from '../redux/slices/api/authApiSlice';
+
 import { toast } from "react-hot-toast"
-function Login() {
+function Register() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useSelector((state) => state.auth);
   const {register, handleSubmit} = useForm();
+  
 
-  const [login] = useLoginMutation()
+ 
 
 
   const submitHandler = async (data) => {
     try {
-      const result = await login(data).unwrap();
+     
 
       dispatch(setCredentials(result.user));
-      toast.success("Login successful");
+      toast.success("Registration successful");
       navigate("/dashboard", { replace: true });
-  
+
     } catch (error) {
       console.error(error);
-      toast.error(error?.data?.message || "Login failed");
+      toast.error(error?.data?.message || "Registration failed");
     }
   };
   
@@ -60,12 +61,21 @@ function Login() {
           <form
           onSubmit={handleSubmit(submitHandler)}
           className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-[400px] flex flex-col gap-y-6 sm:gap-y-8 bg-white dark:bg-slate-900 px-6 sm:px-8 md:px-10 pt-8 sm:pt-12 md:pt-14 pb-8 sm:pb-12 md:pb-14 rounded-lg sm:rounded-xl shadow-lg">
-            <p className='text-blue-600 text-center font-bold text-2xl sm:text-3xl'>Welcome Back</p>
+            <p className='text-blue-600 text-center font-bold text-2xl sm:text-3xl'>Create Account</p>
             <p className='text-center text-sm sm:text-base text-gray-700 dark:text-gray-500'>
-              Keep all your credentials safe!
+              Join us and start managing your tasks!
             </p>
             <div className='flex flex-col gap-y-4 sm:gap-y-5'>
    
+
+            <input
+                name='name'
+                type='text'
+                placeholder='Enter name...'
+                {...register("name", {required: "Name is required"})}
+                className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
+              />
+
               <input 
                 name='email'
                 type='email'
@@ -82,22 +92,17 @@ function Login() {
                 className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
               />
            
-           <span
+           <Link
+            to="/login"
             className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
-                  <Link
-            to="/Register"
-            className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
-               I have no Account? Register
+               Already have an account? Login
             </Link>
-        
-             
-             </span>
             </div>
-            <button 
+            <button
               type='submit'
               className='w-full px-4 sm:px-6 py-3 sm:py-3.5 mt-2 sm:mt-4 text-sm sm:text-base font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
             >
-              Sign In
+              Sign Up
             </button>
           </form>
         </div>
@@ -106,4 +111,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Register

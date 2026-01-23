@@ -7,7 +7,7 @@ import TaskDetails from "./pages/TaskDetails";
 import Dashboard from "./pages/Dashboard";
 import Trash from "./pages/Trash";
 import Users from "./pages/Users";
-
+import Register from "./pages/register";
 import AppSidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { SidebarProvider } from "./components/ui/sidebar";
@@ -18,7 +18,7 @@ function Layout() {
   const location = useLocation();
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/Register" state={{ from: location }} replace />;
   }
 
   return (
@@ -56,7 +56,8 @@ function App() {
       </Route>
 
       {/* Public Route */}
-      <Route path="/login" element={<Login />} />
+      <Route path="/Register" element={<Register />} />
+         <Route path="/Login" element={<Login />} />
     </Routes>
   );
 }
