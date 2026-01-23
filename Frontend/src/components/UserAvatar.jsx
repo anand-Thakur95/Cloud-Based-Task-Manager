@@ -1,10 +1,19 @@
 import React from 'react'
 import { useState, useRef, useEffect } from 'react';
 import { User, LogOut } from 'lucide-react';
-function UserAvatar() {
+import { useLogoutMutation } from '../redux/slices/api/authApiSlice';
+import { logout } from '../redux/slices/authSlice';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Login from '../pages/Login';
 
+
+function UserAvatar() {
     const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+    const dropdownRef = useRef(null);
+    const dispatch = useDispatch()
+    const [logoutUser] = useLogoutMutation();
+    const navigate = useNavigate()
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,13 +27,18 @@ function UserAvatar() {
   }, []);
 
   const handleProfile = () => {
-    console.log('Navigate to profile');
-    setIsOpen(false);
+  
   };
 
-  const handleLogout = () => {
-    console.log('Logging out...');
-    setIsOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logoutUser().unwrap();
+      dispatch(logout())
+      navigate("Login")
+      
+     } catch (error) {
+      console.log(error)
+     }
   };
 
  
