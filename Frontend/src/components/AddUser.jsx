@@ -1,18 +1,20 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ModalWrapper from "./ModalWrapper";
 import { Dialog } from "@headlessui/react";
 import Textbox from "./Textbox";
 import Loading from "./Loading";
 import {Button} from "../components/ui/button";
+import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
+import toast from "react-hot-toast";
+import { useUpateUserMutation } from "../redux/slices/api/userApiSlice";
+import { setCredentials } from "../redux/slices/authSlice";
 
 const AddUser = ({ open, setOpen, userData }) => {
   let defaultValues = userData ?? {};
   const { User } = useSelector((state) => state.auth);
 
-  const isLoading = false,
-    isUpdating = false;
 
   const {
     register,
@@ -20,7 +22,36 @@ const AddUser = ({ open, setOpen, userData }) => {
     formState: { errors },
   } = useForm({ defaultValues });
 
-  const handleOnSubmit = () => {};
+  const dispatch = useDispatch()
+  const [addNewUser, { isLoading }] = useRegisterMutation();
+  const [updateUser, {isUpdating}] = useUpateUserMutation();
+
+  const handleOnSubmit = async (data) => {
+    try {
+      if (userData) {
+       const result = await updateUser(data).unwrap();
+        toast.success("User updated successfully");
+        if(userData?._id === user>_id){
+          dispatch(setCredentials({...result.user}))
+        }
+      } else {
+        const result = await addNewUser({
+          ...data, 
+          password: data.email
+        }).unwrap();
+
+        toast.success("New User added successfully");
+      }
+      
+      setTimeout(() => {
+        setOpen(false);
+      }, 1500); // Changed from 15000ms to 1500ms (1.5 seconds)
+      
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.data?.message || "Failed to add user");
+    }
+  };
 
   return (
     <>
@@ -89,15 +120,17 @@ const AddUser = ({ open, setOpen, userData }) => {
               <Button
                 type='submit'
                 className='bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto'
-                label='Submit'
-              >Submit</Button>
+              >
+                Submit
+              </Button>
 
               <Button
                 type='button'
                 className='bg-white px-5 text-sm font-semibold text-gray-900 sm:w-auto'
                 onClick={() => setOpen(false)}
-                label='Cancel'
-              >Cancel</Button>
+              >
+                Cancel
+              </Button>
             </div>
           )}
         </form>

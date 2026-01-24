@@ -8,12 +8,17 @@ import clsx from "clsx";
 import ConfirmatioDialog, { UserAction } from "../components/Dialogs.jsx";
 import AddUser from "../components/AddUser.jsx"
 import { Button } from "../components/ui/button.jsx";
+import { useGetTeamListQuery } from "../redux/slices/api/userApiSlice.js";
 
 const Users = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [open, setOpen] = useState(false);
   const [openAction, setOpenAction] = useState(false);
   const [selected, setSelected] = useState(null);
+
+const {data, isLoading, error} = useGetTeamListQuery();
+
+console.log(data, error)
 
   const userActionHandler = () => {};
   const deleteHandler = () => {};
@@ -91,14 +96,14 @@ const Users = () => {
 
   return (
     <>
-      <div className='w-full md:px-1 px-0 mb-6'>
+      <div className='mt-16 w-full md:px-1 px-0 mb-6'>
         <div className='flex items-center justify-between mb-8'>
           <Title title='  Team Members' />
           <Button
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5'
             onClick={() => setOpen(true)}
           >
-            <span>Add New User</span>
+            Add New User
             <IoMdAdd className='text-lg' />
           </Button>
         </div>

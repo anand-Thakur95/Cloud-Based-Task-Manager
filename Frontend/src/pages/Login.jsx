@@ -87,7 +87,7 @@ function Login() {
                   <Link
             to="/Register"
             className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
-               I have no Account? Register
+              forget Password
             </Link>
         
              
