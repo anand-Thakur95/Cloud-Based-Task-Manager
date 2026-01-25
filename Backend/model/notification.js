@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const noticeSchema = new Schema(
 {
-    teams: [{type: Schema.Types.ObjectId, ref: "User"}],
+    team: [{type: Schema.Types.ObjectId, ref: "User"}],
     text: {type: String},
     task: {type: Schema.Types.ObjectId, ref: "Task"},
     notiType: {type: String, default: "alert", enum: ["alert", "message"]},

@@ -160,14 +160,14 @@ export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notic = await Notice.findOne({
+    const notice = await Notice.findOne({
       team: userId,
       isRead: { $nin: [userId]},
     }).populate("task", "title");
 
     
 
-    return res.status(200).json({ status: true, notifications });
+    return res.status(200).json({ status: true, notice });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: error.message });
@@ -192,9 +192,9 @@ export const updateUserProfile = async (req, res) => {
     user.role = req.body.role || user.role;
 
 
-    const updateUser = await User.save()
+    const updateUser = await user.save();
 
-    user.password = undefined;
+    updateUser.password = undefined;
 
     res.status(201).json({
       status: true,
@@ -229,7 +229,7 @@ export const markNotificationRead = async (req, res) => {
    }
    else {
     await Notice.findOneAndUpdate({_id: id, isRead: { $nin: [userId]}},
-       {$push: {isRead: {$nin: [userId]}}},
+       {$push: {isRead: userId}},
        {new : true}
     );
    }

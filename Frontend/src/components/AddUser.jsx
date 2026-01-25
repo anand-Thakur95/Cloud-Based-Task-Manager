@@ -8,7 +8,7 @@ import Loading from "./Loading";
 import {Button} from "../components/ui/button";
 import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
 import toast from "react-hot-toast";
-import { useUpateUserMutation } from "../redux/slices/api/userApiSlice";
+import { useUpdateUserMutation } from "../redux/slices/api/userApiSlice"
 import { setCredentials } from "../redux/slices/authSlice";
 
 const AddUser = ({ open, setOpen, userData }) => {
@@ -24,7 +24,7 @@ const AddUser = ({ open, setOpen, userData }) => {
 
   const dispatch = useDispatch()
   const [addNewUser, { isLoading }] = useRegisterMutation();
-  const [updateUser, {isUpdating}] = useUpateUserMutation();
+  const [updateUser, {isUpdating}] = useUpdateUserMutation();
 
   const handleOnSubmit = async (data) => {
     try {

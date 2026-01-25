@@ -19,7 +19,7 @@ export const createTask = async (req, res) => {
     let text = "New task has been assigned to you"
     if (task.team.length > 1) {
 
-      text = text + `and ${task.team.lengh - 1} others`
+      text = text + `and ${task.team.length - 1} others`
     }
 
     text =
@@ -63,7 +63,7 @@ export const duplicateTask = async (req, res) => {
     let text = "New task has been assigned to you"
     if (task.team.length > 1) {
 
-      text = text + `and ${task.team.lengh - 1} others`
+      text = text + `and ${task.team.length - 1} others`
     }
 
     text =
@@ -163,7 +163,7 @@ export const dashboardStatistics = async (req, res) => {
 
     // calculate total Tasks
     const totalTasks = allTasks.length
-    const last10Task = totalTasks?.slice(0, 10)
+    const last10Task = totalTasks.slice(0, 10)
 
     const summary = {
       totalTasks, last10Task, users: isAdmin ? users : [],
@@ -322,7 +322,7 @@ export const deleteRestoreTask = async (req, res) => {
       const resp = await Task.findById(id);
 
       resp.isTrashed = false;
-      resp.save();
+      await resp.save();
     } else if (actionType === "restoreAll") {
       await Task.updateMany(
         { isTrashed: true },

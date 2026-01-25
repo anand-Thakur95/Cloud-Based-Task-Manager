@@ -12,9 +12,9 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { Chart } from "../components/Chart";
-import {summary} from "../assets/data.js"
 import UserInfo from "../components/UserInfo";
 import { getInitials } from "../utils";
+import { useGetDashboardStatsQuery } from "../redux/slices/taskApiSlice";
 
 const TaskTable = ({ tasks = [] }) => {
   const ICONS = {
@@ -195,34 +195,38 @@ return (
 
 
 function Dashboard() {
-  const totals = summary.tasks;
+  const { data, isLoading } = useGetDashboardStatsQuery();
+
+  const summary = data || {};
+
+  const totals = summary.tasks || {};
 
   const stats = [
     {
       _id: "1",
       label: "TOTAL TASK",
-      total: summary.totalTasks,
+      total: summary.totalTasks || 0,
       icon: <FaNewspaper />,
       bg: "bg-[#1d4ed8]",
     },
     {
       _id: "2",
       label: "COMPLTED TASK",
-      total: totals.completed,
+      total: totals.completed || 0,
       icon: <MdAdminPanelSettings />,
       bg: "bg-[#0f766e]",
     },
     {
       _id: "3",
       label: "TASK IN PROGRESS ",
-      total: totals["in progress"],
+      total: totals["in progress"] || 0,
       icon: <LuClipboardPen />,
       bg: "bg-[#f59e0b]",
     },
     {
       _id: "4",
       label: "TODOS",
-      total: totals.todo,
+      total: totals.todo || 0,
       icon: <FaArrowsToDot />,
       bg: "bg-[#be185d]",
     },
@@ -249,6 +253,10 @@ function Dashboard() {
     );
   };
   
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="relative top-16 h-full py-4 px-3 sm:px-4 md:px-5 lg:px-6 w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
@@ -260,16 +268,16 @@ function Dashboard() {
       <div className="w-full bg-white my-8 sm:my-12 md:my-16 p-3 sm:p-4 rounded shadow-sm">
         <h4 className="text-base sm:text-lg font-bold mb-2 sm:mb-4">Chart by Priority</h4>
         <div className="w-full h-64 sm:h-80">
-          <Chart/>
+          <Chart data={summary.graphData} />
         </div>
       </div>
 
       <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-6 py-6 sm:py-8">
         <div className="w-full xl:w-3/5">
-          <TaskTable tasks={summary?.last10Task} />
+          <TaskTable tasks={summary?.last10Task || []} />
         </div>
         <div className="w-full xl:w-2/5">
-          <UserTable users={summary.users} />
+          <UserTable users={summary.users || []} />
         </div>
       </div>
     </div>

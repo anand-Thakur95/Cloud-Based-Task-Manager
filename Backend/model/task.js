@@ -10,8 +10,8 @@ const taskSchema = new Schema({
             default: "normal",
           
     },
-    activities: {
-      type : {
+    activities: [{
+      type: {
         type: String,
         default: "assigned",
         enum: [
@@ -26,7 +26,7 @@ const taskSchema = new Schema({
       activity: String,
       date: {type: Date, default: new Date()},
       by: {type: Schema.Types.ObjectId, ref: "User"},
-    },
+    }],
 
     subTasks : [
 {

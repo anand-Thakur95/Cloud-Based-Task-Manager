@@ -26,4 +26,4 @@ export const userApiSlice = apiSlice.injectEndpoints({
   });
   
 
-  export const { useUpateUserMutation, useGetTeamListQuery } = userApiSlice
+  export const { useUpdateUserMutation, useGetTeamListQuery } = userApiSlice
