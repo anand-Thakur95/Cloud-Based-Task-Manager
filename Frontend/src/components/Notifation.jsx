@@ -1,41 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bell } from 'lucide-react';
+import { useGetNotificationsQuery, useMarkNotiAsReadMutation } from '../redux/slices/api/userApiSlice';
 
 export default function NotificationBar() {
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-  const notifRef = useRef(null);
+ const [open, setOpen] = useState(false);
+ const [selected, setSelected] = useState(null);
 
-  const notifications = [
-    { id: 1, title: 'New message from John', time: '5 min ago', unread: true },
-    { id: 2, title: 'Your post got 10 likes', time: '1 hour ago', unread: true },
-    { id: 3, title: 'Meeting reminder at 3 PM', time: '2 hours ago', unread: false },
-    { id: 4, title: 'System update completed', time: '1 day ago', unread: false },
-  ];
+ const {data, refetch} = useGetNotificationsQuery();
+ const [markAsRead] = useMarkNotiAsReadMutation();
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+ 
+const readHandler = async(type, id) => {
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (notifRef.current && !notifRef.current.contains(event.target)) {
-        setIsNotifOpen(false);
-      }
-    };
+  await markAsRead({type, id}).unwrap();
+  
+  refetch();
+  
+};
+const viewHandler = async(type, id) => {
+setSelected(el)
+readHandler("one",el._id)
+setOpen(true)
+};
+  
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleNotificationClick = (notifId) => {
-    console.log('Notification clicked:', notifId);
-    setIsNotifOpen(false);
-  };
 
   return (
 
           <div className="w-full px-0 flex justify-between items-center h-12">
             <div className="relative" ref={notifRef}>
               <button
-                onClick={() => setIsNotifOpen(!isNotifOpen)}
+                onClick={() => setOpen(!setOpen)}
                 className="relative p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 focus:outline-none"
               >
                 <Bell size={24} className="text-gray-700" />
