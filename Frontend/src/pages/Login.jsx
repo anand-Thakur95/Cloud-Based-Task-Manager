@@ -1,17 +1,18 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/slices/authSlice';
 import { useLoginMutation } from '../redux/slices/api/authApiSlice';
 import { toast } from "react-hot-toast"
+import Loading from '../components/Loading';
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {user} = useSelector((state) => state.auth);
   const {register, handleSubmit} = useForm();
-
   const [login] = useLoginMutation()
+  const isLoading = false;
 
 
   const submitHandler = async (data) => {
@@ -93,12 +94,14 @@ function Login() {
              
              </span>
             </div>
+          {isLoading ? <Loading /> : 
             <button 
               type='submit'
               className='w-full px-4 sm:px-6 py-3 sm:py-3.5 mt-2 sm:mt-4 text-sm sm:text-base font-semibold rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
             >
               Sign In
             </button>
+}
           </form>
         </div>
       </div>

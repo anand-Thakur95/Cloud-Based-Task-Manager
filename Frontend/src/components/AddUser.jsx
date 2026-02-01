@@ -8,12 +8,12 @@ import Loading from "./Loading";
 import {Button} from "../components/ui/button";
 import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
 import toast from "react-hot-toast";
-import { useUpdateUserMutation } from "../redux/slices/api/userApiSlice"
+import { useUpdateUserMutation, useGetTeamListQuery } from "../redux/slices/api/userApiSlice"
 import { setCredentials } from "../redux/slices/authSlice";
 
 const AddUser = ({ open, setOpen, userData }) => {
   let defaultValues = userData ?? {};
-  const { User } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
 
 
   const {
@@ -24,14 +24,17 @@ const AddUser = ({ open, setOpen, userData }) => {
 
   const dispatch = useDispatch()
   const [addNewUser, { isLoading }] = useRegisterMutation();
-  const [updateUser, {isUpdating}] = useUpdateUserMutation();
+  const [updateUser, {isLoading : isUpdating}] = useUpdateUserMutation();
+  const {refetch : refetchTeamList} = useGetTeamListQuery();
 
+  
   const handleOnSubmit = async (data) => {
     try {
       if (userData) {
        const result = await updateUser(data).unwrap();
         toast.success("User updated successfully");
-        if(userData?._id === user>_id){
+        refetchTeamList();
+        if(userData?._id === user._id){
           dispatch(setCredentials({...result.user}))
         }
       } else {
@@ -39,13 +42,14 @@ const AddUser = ({ open, setOpen, userData }) => {
           ...data, 
           password: data.email
         }).unwrap();
-
+        dispatch(setCredentials({...result.user}))
         toast.success("New User added successfully");
+        refetchTeamList();
       }
       
       setTimeout(() => {
         setOpen(false);
-      }, 1500); // Changed from 15000ms to 1500ms (1.5 seconds)
+      }, 1500); 
       
     } catch (error) {
       console.error(error);
@@ -116,7 +120,7 @@ const AddUser = ({ open, setOpen, userData }) => {
               <Loading />
             </div>
           ) : (
-            <div className='py-3 mt-4 sm:flex sm:flex-row-reverse'>
+            <div className='py-3 gap-4 mt-4 sm:flex sm:flex-row-reverse'>
               <Button
                 type='submit'
                 className='bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto'
@@ -126,7 +130,7 @@ const AddUser = ({ open, setOpen, userData }) => {
 
               <Button
                 type='button'
-                className='bg-white px-5 text-sm font-semibold text-gray-900 sm:w-auto'
+                className='bg-red-600 hover:bg-red-500 px-5 text-sm font-semibold text-white sm:w-auto'
                 onClick={() => setOpen(false)}
               >
                 Cancel

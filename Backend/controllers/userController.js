@@ -3,12 +3,19 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Notice from "../model/notification.js";
 
+// Shared cookie options to keep them consistent everywhere
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
+};
+
 // Register User
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, title, isAdmin } = req.body;
 
-    // 1️⃣ Validate required fields
     if (!name || !email || !password || !role || !title) {
       return res.status(400).json({
         status: false,
@@ -16,7 +23,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 2️⃣ Check if user already exists
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).json({
@@ -25,7 +31,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // 3️⃣ Create user (password will be hashed by schema pre-save)
     const user = await User.create({
       name,
       email,
@@ -35,25 +40,8 @@ export const registerUser = async (req, res) => {
       isAdmin: Boolean(isAdmin),
     });
 
-    // 4️⃣ Generate JWT token (for ALL users)
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    // 5️⃣ Set cookie (DEV + PROD safe)
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    // 6️⃣ Remove password from response
     user.password = undefined;
 
-    // 7️⃣ Send response
     return res.status(201).json({
       status: true,
       message: "User registered successfully",
@@ -100,13 +88,7 @@ export const loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 days
-    });
-
+    res.cookie("token", token, cookieOptions); // Fixed: was using sameSite: "strict"
 
     user.password = undefined;
 
@@ -132,8 +114,8 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     res.cookie("token", "", {
-      httpOnly: true,
-      expires: new Date(0),
+      ...cookieOptions,
+      maxAge: 0, // Fixed: was using expires: new Date(0), now consistent
     });
 
     return res.status(200).json({ status: true, message: "Logout successful" });
@@ -165,8 +147,6 @@ export const getNotificationsList = async (req, res) => {
       isRead: { $nin: [userId]},
     }).populate("task", "title");
 
-    
-
     return res.status(200).json({ status: true, notice });
   } catch (error) {
     console.log(error);
@@ -191,7 +171,6 @@ export const updateUserProfile = async (req, res) => {
     user.title = req.body.title || user.title;
     user.role = req.body.role || user.role;
 
-
     const updateUser = await user.save();
 
     updateUser.password = undefined;
@@ -206,7 +185,6 @@ export const updateUserProfile = async (req, res) => {
       res.status(404).json({status: false, message: "User not found"});
     }
 
-   
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: error.message });
@@ -244,7 +222,6 @@ export const markNotificationRead = async (req, res) => {
 export const changeUserPassword = async (req, res) => {
   try {
     const { userId } = req.user;
-   
 
     const user = await User.findById(userId);
 
@@ -253,7 +230,6 @@ export const changeUserPassword = async (req, res) => {
 
      await user.save();
     }
-
 
     return res.status(200).json({ status: true, message: "Password changed successfully" });
   } catch (error) {
@@ -272,7 +248,6 @@ export const activateUserProfile = async (req, res) => {
  user.isActive = req.body.isActive;
 
  await user.save();
-
 
  res.status(201).json({
   status: true,

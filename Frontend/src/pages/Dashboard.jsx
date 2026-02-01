@@ -195,11 +195,11 @@ return (
 
 
 function Dashboard() {
-  // const { data, isLoading } = useGetDashboardStatsQuery();
+  const { data, isLoading } = useGetDashboardStatsQuery();
 
-  // const summary = data || {};
+  const summary = data || {};
 
-  // const totals = summary.tasks || {};
+  const totals = summary.tasks || {};
 
   const stats = [
     {

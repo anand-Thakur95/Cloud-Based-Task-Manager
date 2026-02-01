@@ -5,7 +5,7 @@ const USER_URL = "/user"
 
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-      UpdateUser: builder.mutation({
+      updateUser: builder.mutation({ // Fixed: was "UpdateUser" (capital U)
         query: (data) => ({
           url: `${USER_URL}/profile`,
           method: "PUT",
@@ -21,9 +21,25 @@ export const userApiSlice = apiSlice.injectEndpoints({
           credentials: "include",
         }),
       }),
+
+      deleteUser: builder.mutation({
+        query: (id) => ({
+          url: `${USER_URL}/${id}`,
+          method: "DELETE",
+          credentials: "include",
+        }),
+      }),
      
+      userAction: builder.mutation({
+        query: (data) => ({
+          url: `${USER_URL}/${data.id}`,
+          method: "PUT",
+          body: { isActive: data.isActive }, // Fixed: was missing body
+          credentials: "include",
+        }),
+      }),
     }),
   });
   
 
-  export const { useUpdateUserMutation, useGetTeamListQuery } = userApiSlice
+  export const { useUpdateUserMutation, useGetTeamListQuery, useDeleteUserMutation, useUserActionMutation } = userApiSlice
