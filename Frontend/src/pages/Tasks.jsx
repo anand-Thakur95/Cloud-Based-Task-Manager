@@ -9,9 +9,10 @@ import {Button } from "../components/ui/button.jsx"
 import Tabs from '../components/Tabs.jsx';
 import TaskTitle from '../components/TaskTitle.jsx';
 import BoarderView from '../components/BoardView.jsx';
-import { tasks } from "../assets/data";
+
 import Table from '../components/task/Table.jsx';
 import AddTask from '../components/task/AddTask.jsx';
+import { useGetAllTaskQuery } from '../redux/slices/api/taskApiSlice.js';
 
 const TABS = [
   {title:"Board View", icon:<MdGridView/>},
@@ -28,12 +29,16 @@ const Tasks = () => {
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
-  const [loading] = useState(false);
+  
 
   const status = params?.status || "";
-
-  return loading ? (
-    <div className='py-10'>
+const {data, isLoading} = useGetAllTaskQuery({
+strQuery: status,
+isTrashed: "",
+search: "",
+});
+  return isLoading ? (
+    <div className='py-20'>
       <Loading />
     </div>
   ) : (
@@ -64,11 +69,11 @@ const Tasks = () => {
 
     </div>
  )}
-{selected === 0 ? <BoarderView tasks={tasks}/> : <div>
+{selected === 0 ? <BoarderView tasks={data?.tasks}/>
+ :
+ <div className='w-full'>
   
-  <Table tasks={tasks}/>
-
-
+  <Table tasks={data?.tasks}/>
 
   </div>}
 </Tabs>

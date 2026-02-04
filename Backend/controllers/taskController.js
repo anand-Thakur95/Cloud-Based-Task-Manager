@@ -163,7 +163,7 @@ export const dashboardStatistics = async (req, res) => {
 
     // calculate total Tasks
     const totalTasks = allTasks.length
-    const last10Task = totalTasks.slice(0, 10)
+    const last10Task = allTasks.slice(0, 10)
 
     const summary = {
       totalTasks, last10Task, users: isAdmin ? users : [],

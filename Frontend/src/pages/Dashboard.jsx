@@ -85,30 +85,33 @@ const TaskTable = ({ tasks = [] }) => {
           <span className="capitalize text-xs sm:text-sm hidden sm:inline">{task.priority}</span>
         </div>
       </td>
+
+      
       <td className="py-3 px-2">
         <div className="flex -space-x-1">
-          {Array.isArray(task.team)
+          {Array.isArray(task?.team)
             ? task.team.slice(0, 2).map((member, index) => (
-                <div
-                  key={index}
-                  className={clsx(
-                    "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
-                    BGS[index % BGS.length]
-                  )}
-                >
+              <div
+              key={index}
+              className={clsx(
+                "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
+                BGS[index % BGS.length]
+              )}
+              >
                   <UserInfo user={member} />
                 </div>
               ))
-            : (
+              : (
                 <div
-                  className={clsx(
-                    "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
-                    BGS[task.team.length % BGS.length]
-                  )}
+                className={clsx(
+                  "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
+                  BGS[task.team.length % BGS.length]
+                )}
                   title={task.team}
                 >
                   {getInitials(task.team)}
                 </div>
+                
               )}
           {Array.isArray(task.team) && task.team.length > 2 && (
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-400 text-white flex items-center justify-center text-xs font-semibold">
@@ -117,6 +120,8 @@ const TaskTable = ({ tasks = [] }) => {
           )}
         </div>
       </td>
+
+
       <td className="py-3 px-2">
         <span className="text-xs sm:text-sm text-gray-600">
           {moment(task?.date).fromNow()}
@@ -197,15 +202,14 @@ return (
 function Dashboard() {
   const { data, isLoading } = useGetDashboardStatsQuery();
 
-  const summary = data || {};
-
-  const totals = summary.tasks || {};
+console.log(data)
+  const totals = data?.tasks || {};
 
   const stats = [
     {
       _id: "1",
       label: "TOTAL TASK",
-      total: summary.totalTasks || 0,
+      total: data?.totalTasks || 0,
       icon: <FaNewspaper />,
       bg: "bg-[#1d4ed8]",
     },
@@ -268,16 +272,16 @@ function Dashboard() {
       <div className="w-full bg-white my-8 sm:my-12 md:my-16 p-3 sm:p-4 rounded shadow-sm">
         <h4 className="text-base sm:text-lg font-bold mb-2 sm:mb-4">Chart by Priority</h4>
         <div className="w-full h-64 sm:h-80">
-          <Chart data={summary.graphData} />
+          <Chart data={data?.graphData} />
         </div>
       </div>
 
       <div className="w-full flex flex-col xl:flex-row gap-4 xl:gap-6 py-6 sm:py-8">
         <div className="w-full xl:w-3/5">
-          <TaskTable tasks={summary?.last10Task || []} />
+          <TaskTable tasks={data?.last10Task || []} />
         </div>
         <div className="w-full xl:w-2/5">
-          <UserTable users={summary.users || []} />
+          <UserTable users={data?.users} />
         </div>
       </div>
     </div>
