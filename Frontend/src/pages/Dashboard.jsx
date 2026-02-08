@@ -12,8 +12,6 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { Chart } from "../components/Chart";
-import UserInfo from "../components/UserInfo";
-import { getInitials } from "../utils";
 import { useGetDashboardStatsQuery } from "../redux/slices/taskApiSlice";
 
 const TaskTable = ({ tasks = [] }) => {
@@ -30,7 +28,7 @@ const TaskTable = ({ tasks = [] }) => {
   };
 
   const STAGE_COLORS = {
-    todo: "bg-gray-400",
+    todo: "bg-pink-400",
     "in progress": "bg-blue-400",
     completed: "bg-green-500",
   };
@@ -53,7 +51,7 @@ const TaskTable = ({ tasks = [] }) => {
         .toUpperCase()
         .slice(0, 2);
     }
-    return name[0]?.toUpperCase() || "";
+    return "U";
   };
 
   const TableHeader = () => (
@@ -77,6 +75,7 @@ const TaskTable = ({ tasks = [] }) => {
           <span className="font-medium text-xs sm:text-sm line-clamp-2">{task.title}</span>
         </div>
       </td>
+
       <td className="py-3 px-2">
         <div className="flex items-center gap-1">
           <span className={clsx(PRIORITY_COLORS[task.priority], "text-base sm:text-lg")}>
@@ -86,41 +85,33 @@ const TaskTable = ({ tasks = [] }) => {
         </div>
       </td>
 
-      
       <td className="py-3 px-2">
         <div className="flex -space-x-1">
-          {Array.isArray(task?.team)
-            ? task.team.slice(0, 2).map((member, index) => (
-              <div
-              key={index}
-              className={clsx(
-                "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
-                BGS[index % BGS.length]
-              )}
-              >
-                  <UserInfo user={member} />
-                </div>
-              ))
-              : (
+          {Array.isArray(task?.team) && task.team.length > 0 ? (
+            <>
+              {task.team.slice(0, 2).map((member, index) => (
                 <div
-                className={clsx(
-                  "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold",
-                  BGS[task.team.length % BGS.length]
-                )}
-                  title={task.team}
+                  key={member?._id || index}
+                  className={clsx(
+                    "w-6 h-6 sm:w-7 sm:h-7 rounded-full text-white flex items-center justify-center text-xs font-semibold border-2 border-white",
+                    BGS[index % BGS.length]
+                  )}
+                  title={member?.name || "Team Member"}
                 >
-                  {getInitials(task.team)}
+                  {getInitials(member?.name || "U")}
                 </div>
-                
+              ))}
+              {task.team.length > 2 && (
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-400 text-white flex items-center justify-center text-xs font-semibold border-2 border-white">
+                  +{task.team.length - 2}
+                </div>
               )}
-          {Array.isArray(task.team) && task.team.length > 2 && (
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-gray-400 text-white flex items-center justify-center text-xs font-semibold">
-              +{task.team.length - 2}
-            </div>
+            </>
+          ) : (
+            <div className="text-xs text-gray-400">No team</div>
           )}
         </div>
       </td>
-
 
       <td className="py-3 px-2">
         <span className="text-xs sm:text-sm text-gray-600">
@@ -144,65 +135,76 @@ const TaskTable = ({ tasks = [] }) => {
   );
 };
 
-const UserTable = ({users}) =>{
-const TableHeader = () =>(
-  <thead className="border-b border-gray-300 dark:border-gray-600">
-<tr className="text-black dark:text-white text-left">
-  <th className="py-2 px-2 text-xs sm:text-sm">Full Name</th>
-  <th className="py-2 px-2 text-xs sm:text-sm">Status</th>
-  <th className="py-2 px-2 text-xs sm:text-sm">Created At</th>
-</tr>
-  </thead>
-);
+const UserTable = ({ users }) => {
+  const getInitials = (name) => {
+    if (typeof name === "string") {
+      return name
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    return "U";
+  };
 
-const TableRow = ({ user }) => (
-  <tr className="border-b border-gray-200 text-gray-600 hover:bg-gray-400/10">
-    <td className="py-3 px-2">
-      <div className="flex items-center gap-2 sm:gap-3">
-        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-white flex items-center justify-center text-xs sm:text-sm bg-violet-700 shrink-0">
-          <span className="text-center">{getInitials(user?.name)}</span>
+  const TableHeader = () => (
+    <thead className="border-b border-gray-300 dark:border-gray-600">
+      <tr className="text-black dark:text-white text-left">
+        <th className="py-2 px-2 text-xs sm:text-sm">Full Name</th>
+        <th className="py-2 px-2 text-xs sm:text-sm">Status</th>
+        <th className="py-2 px-2 text-xs sm:text-sm">Created At</th>
+      </tr>
+    </thead>
+  );
+
+  const TableRow = ({ user }) => (
+    <tr className="border-b border-gray-200 text-gray-600 hover:bg-gray-400/10">
+      <td className="py-3 px-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full text-white flex items-center justify-center text-xs sm:text-sm bg-violet-700 shrink-0">
+            <span className="text-center">{getInitials(user?.name)}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-xs sm:text-sm line-clamp-1">{user?.name || "N/A"}</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="font-medium text-xs sm:text-sm line-clamp-1">{user?.name || "N/A"}</p>
-        </div>
-      </div>
-    </td>
-    <td className="py-3 px-2">
-      <span className={clsx(
-        "px-2 py-1 rounded-full text-xs font-semibold inline-block",
-        user?.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-      )}>
-        {user?.isActive ? "Active" : "Inactive"}
-      </span>
-    </td>
-    <td className="py-3 px-2">
-      <span className="text-xs sm:text-sm text-gray-600">
-        {moment(user?.createdAt).fromNow()}
-      </span>
-    </td>
-  </tr>
-)
+      </td>
+      <td className="py-3 px-2">
+        <span className={clsx(
+          "px-2 py-1 rounded-full text-xs font-semibold inline-block",
+          user?.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+        )}>
+          {user?.isActive ? "Active" : "Inactive"}
+        </span>
+      </td>
+      <td className="py-3 px-2">
+        <span className="text-xs sm:text-sm text-gray-600">
+          {moment(user?.createdAt).fromNow()}
+        </span>
+      </td>
+    </tr>
+  );
 
-return (
-  <div className="w-full bg-white h-fit px-3 sm:px-4 py-4 shadow-md rounded">
-    <table className="w-full mb-5">
-      <TableHeader/>
-      <tbody>
-        {users?.map((user, index) => (
-          <TableRow key={index + user?._id} user={user} />
-        ))}
-      </tbody>
-    </table>
-  </div>
-)
-
-}
-
+  return (
+    <div className="w-full bg-white h-fit px-3 sm:px-4 py-4 shadow-md rounded">
+      <table className="w-full mb-5">
+        <TableHeader />
+        <tbody>
+          {users?.map((user, index) => (
+            <TableRow key={index + user?._id} user={user} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 function Dashboard() {
   const { data, isLoading } = useGetDashboardStatsQuery();
 
-console.log(data)
+  console.log(data);
+  
   const totals = data?.tasks || {};
 
   const stats = [
@@ -215,14 +217,14 @@ console.log(data)
     },
     {
       _id: "2",
-      label: "COMPLTED TASK",
+      label: "COMPLETED TASK",
       total: totals.completed || 0,
       icon: <MdAdminPanelSettings />,
       bg: "bg-[#0f766e]",
     },
     {
       _id: "3",
-      label: "TASK IN PROGRESS ",
+      label: "TASK IN PROGRESS",
       total: totals["in progress"] || 0,
       icon: <LuClipboardPen />,
       bg: "bg-[#f59e0b]",
@@ -235,7 +237,7 @@ console.log(data)
       bg: "bg-[#be185d]",
     },
   ];
-  
+
   const Card = ({ icon, bg, label, count }) => {
     return (
       <div className="w-full h-28 sm:h-32 bg-white p-4 sm:p-5 shadow-md rounded-md flex items-center justify-between">
@@ -256,9 +258,13 @@ console.log(data)
       </div>
     );
   };
-  
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -281,7 +287,7 @@ console.log(data)
           <TaskTable tasks={data?.last10Task || []} />
         </div>
         <div className="w-full xl:w-2/5">
-          <UserTable users={data?.users} />
+          <UserTable users={data?.users || []} />
         </div>
       </div>
     </div>

@@ -7,32 +7,113 @@ import SelectList from '../SelectList';
 import Textbox from '../Textbox';
 import { BiImages } from "react-icons/bi";
 import {Button} from "../ui/button"
-
+import { useCreateTaskMutation, useUpdateTaskMutation } from '../../redux/slices/api/taskApiSlice';
+import toast from 'react-hot-toast';
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"]
-const uploadedFileURLs = [];
 
-
-function AddTask({open , setOpen}) {
-    const task = "";
+function AddTask({open , setOpen, task}) {
+ 
     const {register, handleSubmit, formState: {errors},} = useForm();
     const [team, setTeam] = useState(task?.team || []);
     const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0])
+    const [priority, setPriority] = useState(task?.priority?.toUpperCase() || PRIORIRY[2]);
+    const [assets, setAssets] = useState([]);
+    const [uploading, setUploading] = useState(false);
+    
+    const [createTask, {isLoading}] = useCreateTaskMutation();
+    const [updateTask, {isLoading: isUpdating}] = useUpdateTaskMutation(); 
+    
+    const URLS = task?.assets ? [...task.assets] : [];
 
-    const [priority, setPriority] = useState(
-      task?.priority?.toUpperCase() || PRIORIRY[2]
-    );
-    const [, setAssets] = useState([]);
-    const [uploading] = useState(false);
+    const uploadFile = async (file) => {
+      const cloudName = import.meta.env.VITE_CLOUDINARY_NAME;
+      const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+      if (!cloudName || !uploadPreset) {
+        console.error('Missing Cloudinary config:', { cloudName, uploadPreset });
+        throw new Error('Cloudinary configuration missing. Check your .env file.');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+      
+      try {
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+          console.error('Cloudinary Error Response:', data);
+          throw new Error(data.error?.message || `Upload failed: ${response.status}`);
+        }
+
+        console.log('Upload successful:', data.secure_url);
+        return data.secure_url;
+      } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        throw error;
+      }
+    }
+    
+    const SubmitHandler = async (data) => {
+      const uploadedFileURLs = [];
+      
+      if (assets.length > 0) {
+        setUploading(true);
+        
+        try {
+          for(const file of assets) {
+            const url = await uploadFile(file);
+            uploadedFileURLs.push(url);
+          }
+        } catch (error) {
+          console.error("Error uploading file", error.message);
+          setUploading(false);
+          toast.error(error.message || "Failed to upload files");
+          return;
+        } finally {
+          setUploading(false);
+        }
+      }
+
+      try {
+        const newData = {
+          ...data,
+          assets: [...URLS, ...uploadedFileURLs],
+          team,
+          stage,
+          priority,
+        };
+
+        const res = task?._id 
+        ? await updateTask({ ...newData, _id: task._id }).unwrap()
+        : await createTask(newData).unwrap();
+
+        toast.success(res.message);
+
+        setTimeout(()=>{
+          setOpen(false);
+        }, 500)
+      } catch(err) {
+        console.log(err);
+        toast.error(err?.data?.message || err.error)
+      }
+    };
 
     const handleSelect = (e) => {
-      // Handle file selection
       const files = Array.from(e.target.files);
       setAssets(files);
     };
-
-    const SubmitHandler = () => {};
+   
   return (
  <>
 <ModalWrapper open={open} setOpen={setOpen}>
@@ -127,9 +208,10 @@ className='text-base sm:text-lg font-bold leading-6 text-gray-900 mb-4'
       ) : (
         <Button
           type='submit'
-          className='w-full sm:w-auto bg-blue-600 px-6 sm:px-8 text-sm font-semibold text-white hover:bg-blue-700 py-2 sm:py-2.5'
+          disabled={isLoading || isUpdating}
+          className='w-full sm:w-auto bg-blue-600 px-6 sm:px-8 text-sm font-semibold text-white hover:bg-blue-700 py-2 sm:py-2.5 disabled:opacity-50'
         >
-          Submit
+          {isLoading || isUpdating ? 'Submitting...' : 'Submit'}
         </Button>
       )}
 
