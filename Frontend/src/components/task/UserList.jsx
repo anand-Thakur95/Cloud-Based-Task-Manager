@@ -1,16 +1,16 @@
 import React, { Fragment, useState, useEffect } from "react";
-import { summary } from "../../assets/data";
+
 import { Listbox, Transition } from "@headlessui/react";
 import { BsChevronExpand } from "react-icons/bs";
 import clsx from "clsx";
 import {getInitials} from "../../utils/index.js"
 import { MdCheck } from "react-icons/md";
-
+import { useGetTeamListQuery  } from "../../redux/slices/api/userApiSlice.js";
 
 
 
 function UserList({ setTeam, team }) {
-  const data = summary?.users;
+  const {data, loading, error} = useGetTeamListQuery();
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   useEffect(() => {
@@ -25,6 +25,7 @@ function UserList({ setTeam, team }) {
     setTeam(el.map((u) => u._id));
   };
 
+ 
   return (
     <div>
       <p className="text-gray-700">Assign Task To: </p>
@@ -56,9 +57,9 @@ function UserList({ setTeam, team }) {
             leaveTo="opacity-0"
           >
             <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm">
-              {data?.map((user, index) => (
+              {data?.users?.map((user, index) => (
                 <Listbox.Option
-                  key={index}
+                  key={user._id || index}
                   className={({ active }) =>
                     `relative cursor-default select-none py-2 pl-10 pr-4 ${
                       active ? "bg-amber-100 text-amber-900" : "text-gray-900"
