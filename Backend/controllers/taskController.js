@@ -240,15 +240,14 @@ export const getTask = async (req, res) => {
 export const createSubTask = async (req, res) => {
   try {
     const { title, tag, date } = req.body;
-
-    const { id } = req.params;
+    
+    const  { id } = req.params;
 
     const newSubTask = {
       title,
       date,
       tag,
     };
-
     const task = await Task.findById(id);
 
     task.subTasks.push(newSubTask);
