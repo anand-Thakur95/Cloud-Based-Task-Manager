@@ -4,8 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { setCredentials } from '../redux/slices/authSlice';
 import { useLoginMutation } from '../redux/slices/api/authApiSlice';
-import { toast } from "react-hot-toast"
 import Loading from '../components/Loading';
+import { toast, ToastContainer } from 'react-toastify';
+
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -20,8 +21,8 @@ function Login() {
       const result = await login(data).unwrap();
 
       dispatch(setCredentials(result.user));
-      toast.success("Login successful");
       navigate("/dashboard", { replace: true });
+      toast.success("Login successful");
   
     } catch (error) {
       console.error(error);

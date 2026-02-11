@@ -15,7 +15,7 @@ function UserList({ setTeam, team }) {
 
   useEffect(() => {
     if (team && team.length > 0 && data) {
-      const users = data.filter(user => team.includes(user._id));
+      const users = data.users.filter(user => team.includes(user._id));
       setSelectedUsers(users);
     }
   }, [team, data]);

@@ -8,14 +8,22 @@ import Textbox from '../Textbox';
 import { BiImages } from "react-icons/bi";
 import {Button} from "../ui/button"
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../../redux/slices/api/taskApiSlice';
-import toast from 'react-hot-toast';
+import {  toast } from 'react-toastify';
+import { dateFormatter } from '../../utils';
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"]
 
 function AddTask({open , setOpen, task}) {
- 
-    const {register, handleSubmit, formState: {errors},} = useForm();
+ const defaultValues = {
+  title: task?.title || "",
+  date: dateFormatter(task?.date || new Date()),
+  team: [],
+  stage: "",
+  priority: "",
+  assets: [],
+ }
+    const {register, handleSubmit, formState: {errors},} = useForm({defaultValues});
     const [team, setTeam] = useState(task?.team || []);
     const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0])
     const [priority, setPriority] = useState(task?.priority?.toUpperCase() || PRIORIRY[2]);
@@ -98,10 +106,11 @@ function AddTask({open , setOpen, task}) {
         ? await updateTask({ ...newData, _id: task._id }).unwrap()
         : await createTask(newData).unwrap();
 
-        toast.success(res.message);
+        toast.success(res?.message);
 
         setTimeout(()=>{
           setOpen(false);
+          window.location.reload();
         }, 500)
       } catch(err) {
         console.log(err);

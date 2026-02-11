@@ -12,7 +12,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { Chart } from "../components/Chart";
-import { useGetDashboardStatsQuery } from "../redux/slices/taskApiSlice";
+import { useGetDashboardStatsQuery } from "../redux/slices/api/taskApiSlice";
 
 const TaskTable = ({ tasks = [] }) => {
   const ICONS = {

@@ -12,7 +12,8 @@ import BoarderView from '../components/BoardView.jsx';
 
 import Table from '../components/task/Table.jsx';
 import AddTask from '../components/task/AddTask.jsx';
-import { useGetAllTaskQuery } from '../redux/slices/api/taskApiSlice.js';
+import { useGetAllTasksQuery } from '../redux/slices/api/taskApiSlice.js';
+
 
 const TABS = [
   {title:"Board View", icon:<MdGridView/>},
@@ -32,7 +33,7 @@ const Tasks = () => {
   
 
   const status = params?.status || "";
-const {data, isLoading} = useGetAllTaskQuery({
+const {data, isLoading} = useGetAllTasksQuery({
 strQuery: status,
 isTrashed: "",
 search: "",
