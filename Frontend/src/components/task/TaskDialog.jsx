@@ -42,30 +42,24 @@ const TaskDialog = ({ task }) => {
     }
   };
 
-  const deleteClicks = (id) => {
-    setSelected(id);
+  const deleteClicks = () => {
     setOpenDialog(true);
   };
 
-  const deleteHandler =async () => {
- try {
-    const res = await deleteTask({
-      id: task._id,
-      isTrashed: "trash",
-    }).unwrap();
+  const deleteHandler = async () => {
+    try {
+      const res = await deleteTask(task._id).unwrap();
 
-    toast.success(res?.message)
+      toast.success(res?.message);
 
-    setTimeout(()=>{
-      setOpenDialog(false);
-      window.location.reload();
-    }, 500)
- } catch (err) {
-  console.log(err);
-  toast.error(err?.data?.message || err.error);
-  
- }
-
+      setTimeout(() => {
+        setOpenDialog(false);
+        window.location.reload();
+      }, 500);
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.data?.message || err.error);
+    }
   };
 
   const items = [
