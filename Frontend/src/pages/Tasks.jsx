@@ -50,7 +50,7 @@ search: "",
         {!status && (
           <Button
             onClick={() => setOpen(true)}
-            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md py-2 2xl:py-2.5'
+            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white hover:bg-blue-500 rounded-md py-2 2xl:py-2.5'
           >
             <span>Create Task</span>
             <IoMdAdd className='text-lg' />

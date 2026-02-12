@@ -82,14 +82,14 @@ const AddSubTask = ({ open, setOpen, id }) => {
               type='submit'
               className='bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto'
               label='Add Task'
-            />
+            >Add Task</Button>
 
             <Button
               type='button'
-              className='bg-white border text-sm font-semibold text-gray-900 sm:w-auto'
+              className='bg-white border text-sm font-semibold text-gray-900 hover:bg-gray-300 sm:w-auto'
               onClick={() => setOpen(false)}
               label='Cancel'
-            />
+            >Cancel</Button>
           </div>
         </form>
       </ModalWrapper>
