@@ -137,15 +137,20 @@ export const getTeamList = async (req, res) => {
   }
 };
 
-// Get Notifications List
+// Get Notifications List – returns all notifications for the user (read + unread), latest first
 export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notice = await Notice.find({
-      team: userId,
-      isRead: { $nin: [userId]},
-    }).populate("task", "title");
+    const notices = await Notice.find({ team: { $in: [userId] } })
+      .populate("task", "title")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const notice = notices.map((n) => ({
+      ...n,
+      isReadByMe: Array.isArray(n.isRead) && n.isRead.some((id) => id.toString() === userId.toString()),
+    }));
 
     return res.status(200).json({ status: true, notice });
   } catch (error) {
