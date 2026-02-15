@@ -5,6 +5,7 @@ import Notice from "../model/notification.js";
 export const createTask = async (req, res) => {
 
   try {
+    const { userId } = req.user;
     const { title, team, stage, date, priority, assets } = req.body;
     const task = await Task.create({
       title,
@@ -16,7 +17,7 @@ export const createTask = async (req, res) => {
 
     })
 
-    let text = "New task has been assigned to you"
+    let text = `New task "${task.title}" has been assigned to you`
     if (task.team.length > 1) {
 
       text = text + `and ${task.team.length - 1} others`
@@ -27,8 +28,10 @@ export const createTask = async (req, res) => {
       } priority, so check and act accordingly. The task date is ${task.date.toDateString()}. Thank you!!! `
 
 
+    const recipients = [...new Set([...(task.team || []).map((id) => id.toString()), userId.toString()])];
+
     await Notice.create({
-      team: task.team,
+      team: recipients,
       text,
       task: task._id,
     });
@@ -43,6 +46,7 @@ export const createTask = async (req, res) => {
 
 export const duplicateTask = async (req, res) => {
   try {
+    const { userId } = req.user;
     const { id } = req.params;
     const task = await Task.findById(id);
 
@@ -60,7 +64,7 @@ export const duplicateTask = async (req, res) => {
 
     await newTask.save();
 
-    let text = "New task has been assigned to you"
+    let text = `New task "${newTask.title}" has been assigned to you`
     if (task.team.length > 1) {
 
       text = text + `and ${task.team.length - 1} others`
@@ -71,8 +75,10 @@ export const duplicateTask = async (req, res) => {
       } priority, so check and act accordingly. The task date is ${task.date.toDateString()}. Thank you!!! `
 
 
+    const recipients = [...new Set([...(task.team || []).map((id) => id.toString()), userId.toString()])];
+
     await Notice.create({
-      team: task.team,
+      team: recipients,
       text,
       task: task._id,
     });

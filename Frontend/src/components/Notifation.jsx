@@ -1,9 +1,10 @@
 import { Popover, Transition } from "@headlessui/react";
 import moment from "moment";
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import { BiSolidMessageRounded } from "react-icons/bi";
 import { HiBellAlert } from "react-icons/hi2";
 import { IoIosNotificationsOutline } from "react-icons/io";
+import { Link } from "react-router-dom";
 import { useGetNotificationsQuery, useMarkNotiAsReadMutation } from "../redux/slices/api/userApiSlice";
 import ViewNotification from "./ViewNotification";
 
@@ -16,29 +17,26 @@ const ICONS = {
   ),
 };
 
-const Notifications = () => {
+const Notifications= () => {
   const [selected, setSelected] = useState(null);
 
-  // Enable polling and refetch on focus
-  const { data, refetch, isLoading, isError } = useGetNotificationsQuery(undefined, {
-    pollingInterval: 60000, // Poll every 60 seconds
-    refetchOnFocus: true,   // Refetch when tab gains focus
-    refetchOnReconnect: true // Refetch on reconnect
-  });
   
-  const [markAsRead, { isLoading: isMarking }] = useMarkNotiAsReadMutation();
+  const { data, refetch, isLoading } = useGetNotificationsQuery(undefined, {
+    pollingInterval: 30000,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+    refetchOnMountOrArgChange: true,
+  });
 
-  const notifications = data?.notice ?? [];
-  const unreadCount = notifications.filter((n) => !n.isReadByMe).length;
+  const [markAsRead] = useMarkNotiAsReadMutation();
 
-  // Also refetch on window focus
+  
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         refetch();
       }
     };
-    
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [refetch]);
@@ -46,25 +44,59 @@ const Notifications = () => {
   const readHandler = async (type, id) => {
     try {
       await markAsRead({ type, id }).unwrap();
-      await refetch();
-    } catch (err) {
-      console.error("Mark as read failed:", err);
+      refetch(); 
+    } catch (error) {
+      console.error("Failed to mark as read:", error);
     }
   };
 
-  const viewHandler = async (item) => {
+  const viewHandler = (item) => {
     setSelected(item);
-    if (!item.isReadByMe) {
-      await readHandler("one", item._id);
-    }
+    readHandler("one", item._id);
   };
+
+  const callsToAction = [
+    { name: "Cancel", href: "#", icon: "" },
+    {
+      name: "Mark All Read",
+      href: "#",
+      icon: "",
+      onClick: () => readHandler("all", ""),
+    },
+  ];
+
+  // Handle different API response shapes safely
+  const notifications = useMemo(() => {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.notice)) return data.notice;
+    if (Array.isArray(data?.notifications)) return data.notifications;
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
+  }, [data]);
+
+  const unreadCount = useMemo(() => {
+    const backendCount =
+      data?.unreadCount ??
+      data?.unReadCount ??
+      data?.unread ??
+      data?.count ??
+      data?.totalUnread ??
+      data?.total;
+
+    if (typeof backendCount === "number") return backendCount;
+
+    const byIsReadByMe = notifications.filter((item) => !item?.isReadByMe).length;
+    if (byIsReadByMe > 0) return byIsReadByMe;
+    const byIsRead = notifications.filter((item) => !item?.isRead).length;
+    return byIsRead || notifications.length;
+  }, [data, notifications]);
 
   return (
     <>
       <Popover className='relative'>
         <Popover.Button 
           className='inline-flex items-center outline-none'
-          onClick={() => refetch()} // Manual refetch on click
+          onClick={() => refetch()} 
         >
           <div className='w-8 h-8 flex items-center justify-center text-gray-800 relative'>
             <IoIosNotificationsOutline className='text-2xl' />
@@ -90,23 +122,27 @@ const Notifications = () => {
               <div className='w-screen max-w-md flex-auto overflow-hidden rounded-3xl bg-white text-sm leading-6 shadow-lg ring-1 ring-gray-900/5'>
                 <div className='p-4'>
                   {isLoading ? (
-                    <div className='py-6 text-center text-gray-500'>Loading...</div>
-                  ) : isError ? (
-                    <div className='py-6 text-center text-red-500'>Failed to load notifications</div>
-                  ) : notifications.length === 0 ? (
-                    <div className='py-6 text-center text-gray-500'>No notifications</div>
+                    <div className='py-6 text-center text-gray-500'>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="mt-2">Loading...</p>
+                    </div>
+                  ) : notifications?.length === 0 ? (
+                    <div className='py-6 text-center text-gray-500'>
+                      <IoIosNotificationsOutline className="text-4xl mx-auto mb-2 opacity-50" />
+                      <p>No new notifications</p>
+                    </div>
                   ) : (
-                    notifications.slice(0, 5).map((item, index) => (
+                    notifications?.slice(0, 5).map((item, index) => (
                       <div
                         key={item._id + index}
-                        className={`group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50 ${!item.isReadByMe ? "bg-blue-50/50" : ""}`}
+                        className='group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-50'
                       >
                         <div className='mt-1 h-8 w-8 flex items-center justify-center rounded-lg bg-gray-200 group-hover:bg-white'>
-                          {ICONS[item.notiType] ?? ICONS.alert}
+                          {ICONS[item.notiType] || ICONS.alert}
                         </div>
 
                         <div
-                          className='cursor-pointer flex-1 min-w-0'
+                          className='cursor-pointer'
                           onClick={() => {
                             viewHandler(item);
                             close();
@@ -119,7 +155,7 @@ const Notifications = () => {
                             </span>
                           </div>
                           <p className='line-clamp-1 mt-1 text-gray-600'>
-                            {item.text}
+                            {item?.task?.title || item.text}
                           </p>
                         </div>
                       </div>
@@ -127,37 +163,39 @@ const Notifications = () => {
                   )}
                 </div>
 
-                <div className='grid grid-cols-2 divide-x bg-gray-50'>
-                  <button
-                    type='button'
-                    onClick={() => close()}
-                    className='flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100'
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type='button'
-                    onClick={async () => {
-                      await readHandler("all", "");
-                      close();
-                    }}
-                    disabled={isMarking}
-                    className='flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100 disabled:opacity-50'
-                  >
-                    {isMarking ? 'Marking...' : 'Mark All Read'}
-                  </button>
-                </div>
+                {notifications?.length > 0 && (
+                  <div className='grid grid-cols-2 divide-x bg-gray-50'>
+                    {callsToAction.map((item) => (
+                      <Link
+                        key={item.name}
+                        to="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (item?.onClick) {
+                            item.onClick();
+                          }
+                          close();
+                        }}
+                        className='flex items-center justify-center gap-x-2.5 p-3 font-semibold text-blue-600 hover:bg-gray-100'
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </Popover.Panel>
         </Transition>
       </Popover>
 
-      <ViewNotification
-        open={selected !== null}
-        setOpen={() => setSelected(null)}
-        el={selected}
-      />
+      {selected && (
+        <ViewNotification
+          open={selected !== null}
+          setOpen={() => setSelected(null)}
+          el={selected}
+        />
+      )}
     </>
   );
 };

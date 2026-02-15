@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useDispatch } from "react-redux";
 import ModalWrapper from '../ModalWrapper'
 import { Dialog } from '@headlessui/react'
 import UserList from './UserList';
@@ -10,22 +11,28 @@ import {Button} from "../ui/button"
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../../redux/slices/api/taskApiSlice';
 import {  toast } from 'react-toastify';
 import { dateFormatter } from '../../utils';
+import { apiSlice } from "../../redux/slices/apiSlice";
+import { userApiSlice } from "../../redux/slices/api/userApiSlice";
 
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"]
 
-function AddTask({open , setOpen, task}) {
-  
- const defaultValues = {
+const getDefaultValues = (task) => ({
   title: task?.title || "",
   date: dateFormatter(task?.date || new Date()),
   team: [],
   stage: "",
   priority: "",
   assets: [],
- }
-    const {register, handleSubmit, formState: {errors},} = useForm({defaultValues});
+});
+
+function AddTask({open , setOpen, task, onTaskSaved}) {
+  const dispatch = useDispatch();
+  
+    const {register, handleSubmit, formState: {errors}, reset} = useForm({
+      defaultValues: getDefaultValues(task),
+    });
     const [team, setTeam] = useState(task?.team || []);
     const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0])
     const [priority, setPriority] = useState(task?.priority?.toUpperCase() || PRIORIRY[2]);
@@ -36,6 +43,16 @@ function AddTask({open , setOpen, task}) {
     const [updateTask, {isLoading: isUpdating}] = useUpdateTaskMutation(); 
     
     const URLS = task?.assets ? [...task.assets] : [];
+
+    useEffect(() => {
+      if (!open) return;
+
+      reset(getDefaultValues(task));
+      setTeam(task?.team || []);
+      setStage(task?.stage?.toUpperCase() || LISTS[0]);
+      setPriority(task?.priority?.toUpperCase() || PRIORIRY[2]);
+      setAssets([]);
+    }, [open, task, reset]);
 
     const uploadFile = async (file) => {
       const cloudName = import.meta.env.VITE_CLOUDINARY_NAME;
@@ -105,15 +122,26 @@ function AddTask({open , setOpen, task}) {
         };
 
         const res = task?._id 
-        ? await updateTask({ ...newData, _id: task._id }).unwrap()
+        ? await updateTask({ id: task._id, data: newData }).unwrap()
         : await createTask(newData).unwrap();
 
         toast.success(res?.message);
+        dispatch(apiSlice.util.invalidateTags(["Task", "Notification"]));
 
-        setTimeout(()=>{
-          setOpen(false);
-          window.location.reload();
-        }, 500)
+        if (!task?._id) {
+          await dispatch(
+            userApiSlice.endpoints.getNotifications.initiate(undefined, {
+              forceRefetch: true,
+              subscribe: false,
+            })
+          ).unwrap();
+        }
+
+        if (onTaskSaved) {
+          await onTaskSaved();
+        }
+
+        setOpen(false);
       } catch(err) {
         console.log(err);
         toast.error(err?.data?.message || err.error)

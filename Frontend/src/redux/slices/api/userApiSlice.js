@@ -5,49 +5,50 @@ import { apiSlice } from "../apiSlice"
 const USER_URL = "/user"
 
 export const userApiSlice = apiSlice.injectEndpoints({
-    endpoints: (builder) => ({
-      updateUser: builder.mutation({ // Fixed: was "UpdateUser" (capital U)
-        query: (data) => ({
-          url: `${USER_URL}/profile`,
-          method: "PUT",
-          body: data,
-          credentials: "include",
-        }),
+  endpoints: (builder) => ({
+    updateUser: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/profile`,
+        method: "PUT",
+        body: data,
+        credentials: "include",
       }),
+    }),
 
-      getTeamList: builder.query({
-        query: () => ({
-          url: `${USER_URL}/get-team`,
-          method: "GET",
-          credentials: "include",
-        }),
+    getTeamList: builder.query({
+      query: () => ({
+        url: `${USER_URL}/get-team`,
+        method: "GET",
+        credentials: "include",
       }),
+    }),
 
-      deleteUser: builder.mutation({
-        query: (id) => ({
-          url: `${USER_URL}/${id}`,
-          method: "DELETE",
-          credentials: "include",
-        }),
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `${USER_URL}/${id}`,
+        method: "DELETE",
+        credentials: "include",
       }),
-     
-      userAction: builder.mutation({
-        query: (data) => ({
-          url: `${USER_URL}/${data.id}`,
-          method: "PUT",
-          body: { isActive: data.isActive }, // Fixed: was missing body
-          credentials: "include",
-        }),
-      }),
-    
+    }),
 
-    getNotifications : builder.query({
+    userAction: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/${data.id}`,
+        method: "PUT",
+        body: { isActive: data.isActive },
+        credentials: "include",
+      }),
+    }),
+
+    getNotifications: builder.query({
       query: () => ({
         url: `${USER_URL}/notifications`,
         method: "GET",
         credentials: "include",
       }),
+      providesTags: ["Notification"],
     }),
+
     markNotiAsRead: builder.mutation({
       query: (data) => ({
         url: `${USER_URL}/read-noti?isReadType=${data.type}&id=${data?.id}`,
@@ -55,19 +56,19 @@ export const userApiSlice = apiSlice.injectEndpoints({
         body: data,
         credentials: "include",
       }),
+      invalidatesTags: ["Notification"],
+    }),
 
-
-      changePassword: builder.mutation({
-        query: (data) => ({
-          url: `${USER_URL}/change-password`,
-          method: "PUT",
-          body: data,
-          credentials: "include",
-        }),
+    changePassword: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/change-password`,
+        method: "PUT",
+        body: data,
+        credentials: "include",
       }),
-    })
-  })
-  });
+    }),
+  }),
+});
   
 
   export const { useUpdateUserMutation, useGetTeamListQuery, useDeleteUserMutation, useUserActionMutation, useGetNotificationsQuery, useMarkNotiAsReadMutation, useChangePasswordMutation } = userApiSlice

@@ -142,20 +142,21 @@ export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notices = await Notice.find({ team: { $in: [userId] } })
+    const notice = await Notice.find({
+      team: userId,
+      isRead: { $nin: [userId] },
+    })
       .populate("task", "title")
-      .sort({ createdAt: -1 })
-      .lean();
+      .sort({ createdAt: -1 });
 
-    const notice = notices.map((n) => ({
-      ...n,
-      isReadByMe: Array.isArray(n.isRead) && n.isRead.some((id) => id.toString() === userId.toString()),
-    }));
-
-    return res.status(200).json({ status: true, notice });
+    return res.status(200).json({
+      status: true,
+      notice,
+      unreadCount: notice.length,
+    });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ status: false, message: error.message });
+    return res.status(400).json({ status: false, message: error.message });
   }
 };
 
