@@ -47,7 +47,7 @@ function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/tasks" element={<Tasks />} />
-        <Route path="/complete" element={<Tasks />} />
+        <Route path="/complete/:status" element={<Tasks />} />
         <Route path="/in-process" element={<Tasks />} />
         <Route path="/todo" element={<Tasks />} />
         <Route path="/Details" element={<TaskDetails />} />

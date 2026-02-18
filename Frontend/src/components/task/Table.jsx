@@ -6,13 +6,13 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-// import { toast } from "sonner";
+
 import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
-import UserInfo from "../UserInfo";
-import { Button } from "@headlessui/react";
-
+import ConfirmatioDialog from "../Dialogs";
+import {Button} from "../ui/Button";
+import UserInfo from "../UserInfo"
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -23,6 +23,8 @@ const ICONS = {
 const Table = ({ tasks }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
+
+const [trashTask] = useTrashTaskMutation()
 
   const deleteClicks = (id) => {
     setSelected(id);
@@ -108,17 +110,17 @@ const Table = ({ tasks }) => {
 
       <td className='py-2 flex gap-2 md:gap-4 justify-end'>
         <Button
-          className='text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base'
+          className='text-blue-600 hover:text-blue-500 hover:bg-transfarent  sm:px-0 text-sm md:text-base bg-transfarent'
           label='Edit'
           type='button'
-        />
+        >Edit</Button>
 
         <Button
-          className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base'
+          className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base hover:bg-transfarent bg-transfarent'
           label='Delete'
           type='button'
           onClick={() => deleteClicks(task._id)}
-        />
+        >Delete</Button>
       </td>
     </tr>
   );
@@ -138,11 +140,11 @@ const Table = ({ tasks }) => {
       </div>
 
       {/* TODO */}
-      {/* <ConfirmatioDialog
+      <ConfirmatioDialog
         open={openDialog}
         setOpen={setOpenDialog}
         onClick={deleteHandler}
-      /> */}
+      />
     </>
   );
 };
