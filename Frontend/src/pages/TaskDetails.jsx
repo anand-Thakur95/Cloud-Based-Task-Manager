@@ -14,19 +14,15 @@ import {
 import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
 // import { toast } from "sonner";
-import { tasks } from "../assets/data";
+
 import Tabs from "../components/Tabs";
+import { useGetSingleTaskQuery } from "../redux/slices/api/taskApiSlice.js";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 
 import { Button } from "../components/ui/button.jsx"
 import Loading from "../components/Loading.jsx";
 
-const assets = [
-  "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/8797307/pexels-photo-8797307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/2534523/pexels-photo-2534523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/804049/pexels-photo-804049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-];
+
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -90,8 +86,17 @@ const act_types = [
 const TaskDetails = () => {
   const { id } = useParams();
 
+const {data, isLoading} = useGetSingleTaskQuery(id);
+
   const [selected, setSelected] = useState(0);
-  const task = tasks[3];
+  const task = data?.task;
+
+  if(isLoading)
+    return (
+  <div className="py-20">
+    <Loading />
+  </div>
+)
 
   return (
     <div className='w-full flex flex-col gap-3 mb-4 overflow-y-hidden'>

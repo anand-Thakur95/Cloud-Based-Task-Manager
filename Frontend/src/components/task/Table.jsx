@@ -13,7 +13,9 @@ import { FaList } from "react-icons/fa";
 import ConfirmatioDialog from "../Dialogs";
 import {Button} from "../ui/Button";
 import UserInfo from "../UserInfo"
-
+import { useTrashTaskMutation } from '../../redux/slices/api/taskApiSlice';
+import { toast } from "react-toastify";
+import AddTask from "./AddTask";
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
   medium: <MdKeyboardArrowUp />,
@@ -23,15 +25,35 @@ const ICONS = {
 const Table = ({ tasks }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
+const [openEdit, setOpenEdit] = useState(false);
+const [trashTask] = useTrashTaskMutation();
 
-const [trashTask] = useTrashTaskMutation()
+const deleteClicks = (id) => {
+  setSelected(id);
+  setOpenDialog(true);
 
-  const deleteClicks = (id) => {
-    setSelected(id);
-    setOpenDialog(true);
+  setTimeout(() => {
+    setOpenDialog(false);
+  }, 3000);
+};
+
+const editTaskHandler = (el) => {
+  setSelected(el);
+  setOpenEdit(true);
+}
+
+
+  const deleteHandler = async() => {
+
+    try {
+      const result = await trashTask(selected).unwrap()
+      toast.success(result?.message)
+
+    } catch (err) {
+      console.log(err)
+      toast.error(err?.data?.message || err.error)
+    }
   };
-
-  const deleteHandler = () => {};
 
   const TableHeader = () => (
     <thead className='w-full border-b border-gray-300'>
@@ -113,6 +135,7 @@ const [trashTask] = useTrashTaskMutation()
           className='text-blue-600 hover:text-blue-500 hover:bg-transfarent  sm:px-0 text-sm md:text-base bg-transfarent'
           label='Edit'
           type='button'
+          onClick={()=> editTaskHandler(task)}
         >Edit</Button>
 
         <Button
@@ -144,6 +167,13 @@ const [trashTask] = useTrashTaskMutation()
         open={openDialog}
         setOpen={setOpenDialog}
         onClick={deleteHandler}
+      />
+
+      <AddTask
+      open={openEdit}
+      setOpen={setOpenEdit}
+      task={selected}
+      key={new Date().getTime()}
       />
     </>
   );

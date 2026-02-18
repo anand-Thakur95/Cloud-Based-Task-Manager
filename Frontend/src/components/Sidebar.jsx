@@ -1,4 +1,5 @@
 import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users,TableOfContents, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 
 import { MdDashboard } from "react-icons/md";
@@ -17,11 +18,11 @@ import {
 // Menu items
 const items = [
   { title: "Tasks", url: "/tasks", icon: TableOfContents },
-  { title: "Complete", url: "/complete", icon: CircleCheckBig },
-  { title: "In Process", url: "/in-process", icon: ClipboardClock },
-  { title: "To Do", url: "/todo", icon: ClipboardCheck },
+  { title: "Complete", url: "/completed/completed", icon: CircleCheckBig },
+  { title: "In Process", url: "/in-progress/in%20progress", icon: ClipboardClock },
+  { title: "To Do", url: "/todo/todo", icon: ClipboardCheck },
   { title: "Team", url: "/team", icon: Users },
-  { title: "Trash", url: "/trash", icon: Trash2 },
+  { title: "Trash", url: "/trashed", icon: Trash2 },
  
 ];
 
@@ -45,10 +46,10 @@ export function AppSidebar() {
                 <SidebarMenuButton
                   asChild
                 >
-                  <a href={item.url}>
+                  <Link to={item.url}>
                     <item.icon />
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
                 
               </SidebarMenuItem>
