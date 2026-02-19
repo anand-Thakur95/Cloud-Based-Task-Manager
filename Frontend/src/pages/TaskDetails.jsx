@@ -16,11 +16,12 @@ import { useParams } from "react-router-dom";
 // import { toast } from "sonner";
 
 import Tabs from "../components/Tabs";
-import { useGetSingleTaskQuery } from "../redux/slices/api/taskApiSlice.js";
+import { useGetSingleTaskQuery, usePostTaskActivityMutation } from "../redux/slices/api/taskApiSlice.js";
 import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
 
 import { Button } from "../components/ui/button.jsx"
 import Loading from "../components/Loading.jsx";
+import { toast } from "react-toastify";
 
 
 
@@ -86,7 +87,7 @@ const act_types = [
 const TaskDetails = () => {
   const { id } = useParams();
 
-const {data, isLoading} = useGetSingleTaskQuery(id);
+const {data, isLoading, refetch} = useGetSingleTaskQuery(id);
 
   const [selected, setSelected] = useState(0);
   const task = data?.task;
@@ -226,7 +227,7 @@ const {data, isLoading} = useGetSingleTaskQuery(id);
           </>
         ) : (
           <>
-            <Activities activity={task?.activities} id={id} />
+            <Activities activity={task?.activities} id={id}  refetch={refetch}/>
           </>
         )}
       </Tabs>
@@ -234,12 +235,34 @@ const {data, isLoading} = useGetSingleTaskQuery(id);
   );
 };
 
-const Activities = ({ activity, id }) => {
+const Activities = ({ activity, id, refetch }) => {
   const [selected, setSelected] = useState(act_types[0]);
   const [text, setText] = useState("");
-  const isLoading = false;
+ 
 
-  const handleSubmit = async () => {};
+  const [postActivity, {isLoading}] = usePostTaskActivityMutation();
+
+  const handleSubmit = async () => {
+ try {
+  const activityData = {
+    type: selected?.toLowerCase(),
+    activity: text,
+  };
+  const result = await postActivity({
+    data: activityData,
+    id
+
+  }).unwrap()
+  
+  toast.success(result?.message)
+setText("")
+
+ } catch (error) {
+  console.log(error)
+  toast.error(error?.data?.message || error.error)
+ }
+
+  };
 
   const Card = ({ item }) => {
     return (

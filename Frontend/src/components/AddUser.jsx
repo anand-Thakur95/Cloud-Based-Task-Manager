@@ -31,7 +31,7 @@ const AddUser = ({ open, setOpen, userData }) => {
   const handleOnSubmit = async (data) => {
     try {
       if (userData) {
-       const result = await updateUser(data).unwrap();
+       const result = await updateUser({ ...data, _id: userData?._id }).unwrap();
         toast.success("User updated successfully");
         refetchTeamList();
         if(userData?._id === user._id){
@@ -47,9 +47,7 @@ const AddUser = ({ open, setOpen, userData }) => {
         refetchTeamList();
       }
       
-      setTimeout(() => {
-        setOpen(false);
-      }, 1500); 
+      setOpen(false);
       
     } catch (error) {
       console.error(error);

@@ -25,6 +25,11 @@ const Users = () => {
   const [userAction] = useUserActionMutation();
 
   const userActionHandler = async () => {
+    if (!selected?._id) {
+      toast.error("User not selected");
+      return;
+    }
+
     try {
      
       const result = await userAction({
@@ -34,10 +39,8 @@ const Users = () => {
 
       toast.success(result?.message || "User updated successfully");
       refetch();
+      setOpenAction(false);
       setSelected(null);
-      setTimeout(() => {
-        setOpenAction(false);
-      }, 1500);
     } catch (error) {
       console.log(error);
       toast.error(error?.data?.message || "Failed to update user");
@@ -45,16 +48,19 @@ const Users = () => {
   };
 
   const deleteHandler = async () => {
+    if (!selected?._id) {
+      toast.error("User not selected");
+      return;
+    }
+
     try {
 
       const result = await deleteUser(selected?._id).unwrap();
 
       toast.success(result?.message || "User deleted successfully");
       refetch();
+      setOpenDialog(false);
       setSelected(null);
-      setTimeout(() => {
-        setOpenDialog(false);
-      }, 1000);
     } catch (error) {
       console.log(error);
       toast.error(error?.data?.message || "Failed to delete user");
@@ -159,8 +165,8 @@ const Users = () => {
             <table className="w-full mb-5">
               <TableHeader />
               <tbody>
-                {teamList?.users?.map((user, index) => (
-                  <TableRow key={index} user={user} />
+                {teamList?.users?.map((user) => (
+                  <TableRow key={user?._id} user={user} />
                 ))}
               </tbody>
             </table>
@@ -172,7 +178,7 @@ const Users = () => {
         open={open}
         setOpen={setOpen}
         userData={selected}
-        key={new Date().getTime().toString()}
+        key={selected?._id || "new-user"}
       />
 
       <ConfirmatioDialog
