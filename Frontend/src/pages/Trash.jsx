@@ -137,13 +137,13 @@ const Trash = () => {
             <Button
               label="Restore All"
               icon={<MdOutlineRestore className="text-lg hidden md:flex" />}
-              className="flex flex-row-reverse gap-1 items-center text-black text-sm md:text-base rounded-md 2xl:py-2.5 bg-transparent"
+              className="flex flex-row-reverse gap-1 items-center text-black text-sm md:text-base rounded-md 2xl:py-2.5 bg-transparent hover:bg-transparent hover:text-gray-900"
               onClick={restoreAllClick}
             >Restore All</Button>
             <Button
               label="Delete All"
               icon={<MdDelete className="text-lg hidden md:flex" />}
-              className="flex flex-row-reverse gap-1 items-center text-red-600 text-sm md:text-base rounded-md 2xl:py-2.5"
+              className="flex flex-row-reverse gap-1 items-center text-red-600 text-sm md:text-base rounded-md 2xl:py-2.5 bg-transparent hover:bg-transparent hover:text-red-500"
               onClick={deleteAllClick}
             >Delete All</Button>
           </div>
