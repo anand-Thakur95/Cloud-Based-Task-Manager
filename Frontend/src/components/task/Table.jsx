@@ -11,7 +11,7 @@ import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
 import ConfirmatioDialog from "../Dialogs";
-import { Button } from "../ui/Button"
+import { Button } from "../ui/button.jsx"
 import UserInfo from "../UserInfo"
 import { useTrashTaskMutation } from '../../redux/slices/api/taskApiSlice';
 import { toast } from "react-toastify";
