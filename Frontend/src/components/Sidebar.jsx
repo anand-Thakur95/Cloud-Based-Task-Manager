@@ -1,7 +1,7 @@
 import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users,TableOfContents, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-
-
+import Dashboard from "../pages/Dashboard"
+import { useNavigate } from 'react-router-dom';
 import { MdDashboard } from "react-icons/md";
 import {
   Sidebar,
@@ -28,11 +28,13 @@ const items = [
 
 export function AppSidebar() {
   
-
+  const navigate = useNavigate();
   return (
     
       <Sidebar className="flex left-0 right-0 top-15">
-        <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2">
+        <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2 cursor-pointer"
+        onClick={() => navigate('/Dashboard')}
+        >
           <MdDashboard />
           <p className="font-bold">Dashboard</p>
         </SidebarHeader>
