@@ -203,7 +203,7 @@ const UserTable = ({ users }) => {
 function Dashboard() {
   const { data, isLoading } = useGetDashboardStatsQuery();
 
-  console.log(data);
+ 
   
   const totals = data?.tasks || {};
 
@@ -244,7 +244,7 @@ function Dashboard() {
         <div className="h-full flex flex-1 flex-col items-start justify-between min-w-0">
           <p className="text-xs sm:text-sm text-gray-500 line-clamp-1 w-full">{label}</p>
           <span className="text-xl sm:text-2xl font-bold">{count}</span>
-          <span className="text-xs sm:text-sm text-gray-500">{"129 days"}</span>
+          <span className="text-xs sm:text-sm text-gray-500">{"50 last month"}</span>
         </div>
 
         <div
