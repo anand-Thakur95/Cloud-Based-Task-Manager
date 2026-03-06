@@ -1,182 +1,131 @@
-☁️ Cloud-Based Task Management System
+# Task Management App
 
-A Cloud-Based Task Management System that helps teams create, assign, manage, and track tasks efficiently in real time. This application allows users to collaborate, organize tasks by priority and status, and monitor project progress through a modern web interface.
+Full-stack task management application with:
 
-🚀 Features
+- `Frontend`: React + Vite + Redux Toolkit Query
+- `Backend`: Node.js + Express + MongoDB (Mongoose)
+- Cookie-based JWT authentication
 
-👤 User Authentication (Login / Register)
+## Project Structure
 
-📝 Create, Update, Delete Tasks
+```text
+Task Management/
+  Frontend/   # React client
+  Backend/    # Express API
+```
 
-📌 Assign Tasks to Team Members
+## Tech Stack
 
-📅 Task Scheduling with Due Dates
+- Frontend: React 19, Vite, Redux Toolkit, React Router, Tailwind CSS
+- Backend: Express 5, Mongoose, JWT, bcryptjs, cookie-parser, cors
+- Database: MongoDB
 
-⚡ Task Status Management (Todo, In Progress, Completed)
+## Prerequisites
 
-🔥 Priority Levels (Low, Normal, High)
+- Node.js 18+
+- npm
+- MongoDB instance (local or cloud)
 
-📂 Attach Assets / Files to Tasks
+## Environment Variables
 
-📊 Dashboard for Task Overview
+Create `Backend/.env`:
 
-👥 User Role Management
+```env
+PORT=8800
+MONGODB_URL=mongodb://127.0.0.1:27017/task-manager
+JWT_SECRET=your_super_secret_key
+NODE_ENV=development
+```
 
-🗑️ Trash & Restore Deleted Tasks
+Create `Frontend/.env`:
 
-📱 Responsive UI
+```env
+VITE_APP_BASE_URL=http://localhost:8800
+```
 
-🏗️ Tech Stack
-Frontend
+## Installation
 
-React.js
+Install backend dependencies:
 
-Redux Toolkit
-
-Tailwind CSS
-
-React Icons
-
-Headless UI
-
-Backend
-
-Node.js
-
-Express.js
-
-MongoDB
-
-Mongoose
-
-JWT Authentication
-
-Deployment
-
-Netlify (Frontend)
-
-Render / Railway / AWS (Backend)
-
-MongoDB Atlas (Database)
-
-📂 Project Structure
-Task-Management-System
-│
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── pages
-│   │   ├── redux
-│   │   ├── utils
-│   │   └── App.js
-│   │
-│   └── package.json
-│
-├── backend
-│   ├── controllers
-│   ├── models
-│   ├── routes
-│   ├── middleware
-│   ├── config
-│   └── server.js
-│
-└── README.md
-⚙️ Installation
-1️⃣ Clone the Repository
-git clone https://github.com/yourusername/cloud-task-manager.git
-cd cloud-task-manager
-2️⃣ Install Dependencies
-Frontend
-cd frontend
+```bash
+cd Backend
 npm install
-Backend
-cd backend
+```
+
+Install frontend dependencies:
+
+```bash
+cd ../Frontend
 npm install
-3️⃣ Environment Variables
+```
 
-Create a .env file inside backend
+## Run Locally
 
-PORT=5000
-MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret_key
-▶️ Run the Project
-Start Backend
-cd backend
-npm run dev
-Start Frontend
-cd frontend
+Start backend:
+
+```bash
+cd Backend
 npm start
-🌐 API Endpoints
-Authentication
-Method	Endpoint	Description
-POST	/api/auth/register	Register user
-POST	/api/auth/login	Login user
-Tasks
-Method	Endpoint	Description
-GET	/api/tasks	Get all tasks
-POST	/api/tasks	Create task
-PUT	/api/tasks/:id	Update task
-DELETE	/api/tasks/:id	Delete task
-📸 Screenshots
-Dashboard
+```
 
-Task overview with statistics and recent activities.
+Start frontend:
 
-Add Task
+```bash
+cd Frontend
+npm run dev
+```
 
-Create and assign tasks to team members with priority and deadline.
+Default local URLs:
 
-Task Details
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8800`
 
-View full task information, comments, and attachments.
+## API Base
 
-🔒 Security
+All API routes are served under:
 
-JWT Authentication
+`/api`
 
-Protected Routes
+Examples:
 
-Role-Based Access Control
+- `/api/user/login`
+- `/api/task/dashboard`
 
-📦 Future Improvements
+## Main API Endpoints
 
-Real-time notifications
+User routes:
 
-Team chat
+- `POST /api/user/register`
+- `POST /api/user/login`
+- `POST /api/user/logout`
+- `GET /api/user/get-team` (admin)
+- `GET /api/user/notifications`
+- `PUT /api/user/profile`
+- `PUT /api/user/read-noti`
+- `PUT /api/user/change-password`
+- `PUT /api/user/:id` (admin activate/deactivate)
+- `DELETE /api/user/:id` (admin delete user)
 
-Task comments
+Task routes:
 
-Activity logs
+- `POST /api/task/create` (admin)
+- `POST /api/task/duplicate/:id` (admin)
+- `POST /api/task/activity/:id`
+- `GET /api/task/dashboard`
+- `GET /api/task`
+- `GET /api/task/:id`
+- `PUT /api/task/create-subtask/:id` (admin)
+- `PUT /api/task/update/:id` (admin)
+- `PUT /api/task/:id` (admin, move to trash)
+- `DELETE /api/task/delete-restore/:id`
 
-Email reminders
+## Authentication
 
-Drag & drop Kanban board
+- Backend sets a `token` cookie on login/register.
+- Protected endpoints require that cookie.
+- Admin-only routes are enforced by `isAdmin` middleware.
 
-🤝 Contributing
+## Notes
 
-Contributions are welcome!
-
-Fork the repository
-
-Create a new branch
-
-git checkout -b feature-name
-
-Commit your changes
-
-git commit -m "Added new feature"
-
-Push to GitHub
-
-git push origin feature-name
-📜 License
-
-This project is licensed under the MIT License.
-
-👨‍💻 Author
-
-Anand Thakur
-
-Full Stack Developer
-
-Passionate about building scalable web applications.
+- Backend CORS is currently configured for `http://localhost:5173`.
+- Frontend sends credentials (`credentials: include`) for auth requests.
