@@ -4,7 +4,6 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  forgotPassword,
   getTeamList,
   getNotificationsList,
   updateUserProfile,
@@ -19,7 +18,7 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-router.post("/forgot-password", forgotPassword);
+
 
 router.get("/get-team", protectRoute, isAdminRoute, getTeamList);
 router.get("/notifications", protectRoute, getNotificationsList);
@@ -28,10 +27,10 @@ router.put("/profile", protectRoute, updateUserProfile);
 router.put("/read-noti", protectRoute, markNotificationRead);
 router.put("/change-password", protectRoute, changeUserPassword);
 
-// only for admin
+
 router
-  .route("/:id")
-  .put(protectRoute, isAdminRoute, activateUserProfile)
-  .delete(protectRoute, isAdminRoute, deleteUserProfile);
+.route("/:id")
+.put(protectRoute, isAdminRoute, activateUserProfile)
+.delete(protectRoute, isAdminRoute, deleteUserProfile);
 
 export default router;

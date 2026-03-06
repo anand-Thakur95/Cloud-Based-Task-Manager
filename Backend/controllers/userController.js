@@ -3,19 +3,12 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Notice from "../model/notification.js";
 
-// Shared cookie options to keep them consistent everywhere
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
-};
-
 // Register User
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, role, title, isAdmin } = req.body;
 
+    // 1️⃣ Validate required fields
     if (!name || !email || !password || !role || !title) {
       return res.status(400).json({
         status: false,
@@ -23,6 +16,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
+    // 2️⃣ Check if user already exists
     const userExist = await User.findOne({ email });
     if (userExist) {
       return res.status(400).json({
@@ -31,6 +25,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
+    // 3️⃣ Create user (password will be hashed by schema pre-save)
     const user = await User.create({
       name,
       email,
@@ -40,8 +35,25 @@ export const registerUser = async (req, res) => {
       isAdmin: Boolean(isAdmin),
     });
 
+    // 4️⃣ Generate JWT token (for ALL users)
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // 5️⃣ Set cookie (DEV + PROD safe)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // true in prod
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
+    // 6️⃣ Remove password from response
     user.password = undefined;
 
+    // 7️⃣ Send response
     return res.status(201).json({
       status: true,
       message: "User registered successfully",
@@ -88,7 +100,13 @@ export const loginUser = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.cookie("token", token, cookieOptions); // Fixed: was using sameSite: "strict"
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: "none",
+      maxAge: 24 * 60 * 60 * 1000, // 1 days
+    });
+
 
     user.password = undefined;
 
@@ -114,8 +132,8 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   try {
     res.cookie("token", "", {
-      ...cookieOptions,
-      maxAge: 0, // Fixed: was using expires: new Date(0), now consistent
+      httpOnly: true,
+      expires: new Date(0),
     });
 
     return res.status(200).json({ status: true, message: "Logout successful" });
@@ -125,35 +143,6 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-// Forgot Password
-export const forgotPassword = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ status: false, message: "Email and new password are required" });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ status: false, message: "User not found" });
-    }
-
-    user.password = password;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-
-    await user.save();
-
-    return res.status(200).json({
-      status: true,
-      message: "Password updated successfully",
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ status: false, message: error.message });
-  }
-};
 // Get Team List
 export const getTeamList = async (req, res) => {
   try {
@@ -166,26 +155,22 @@ export const getTeamList = async (req, res) => {
   }
 };
 
-// Get Notifications List – returns all notifications for the user (read + unread), latest first
+// Get Notifications List
 export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notice = await Notice.find({
+    const notic = await Notice.findOne({
       team: userId,
-      isRead: { $nin: [userId] },
-    })
-      .populate("task", "title")
-      .sort({ createdAt: -1 });
+      isRead: { $nin: [userId]},
+    }).populate("task", "title");
 
-    return res.status(200).json({
-      status: true,
-      notice,
-      unreadCount: notice.length,
-    });
+    
+
+    return res.status(200).json({ status: true, notifications });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ status: false, message: error.message });
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -193,46 +178,40 @@ export const getNotificationsList = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     const { userId, isAdmin } = req.user;
-    const { _id, name, title, role, email } = req.body;
+    const { _id } = req.body;
 
-    const id =
-      isAdmin && userId === _id
-        ? userId
-        : isAdmin && userId !== _id
-        ? _id
-        : userId;
+   const id = 
+   isAdmin && userId === _id ? userId : isAdmin && userId !== _id ? _id : userId;
 
-    const user = await User.findById(id);
+   const user = await User.findById(id)
 
-    if (!user) {
-      return res.status(404).json({ status: false, message: "User not found" });
-    }
+   if(user) {
+     
+    user.name = req.body.name || user.name;
+    user.title = req.body.title || user.title;
+    user.role = req.body.role || user.role;
 
-    if (email && email !== user.email) {
-      const existingUser = await User.findOne({ email });
-      if (existingUser && existingUser._id.toString() !== user._id.toString()) {
-        return res.status(400).json({ status: false, message: "Email already in use" });
-      }
-      user.email = email;
-    }
 
-    user.name = name || user.name;
-    user.title = title || user.title;
-    user.role = role || user.role;
+    const updateUser = await User.save()
 
-    const updatedUser = await user.save();
-    updatedUser.password = undefined;
+    user.password = undefined;
 
-    return res.status(200).json({
+    res.status(201).json({
       status: true,
-      message: "Profile updated successfully",
-      user: updatedUser,
+      message: "Profile Update Successfully",
+      user: updateUser,
     });
+  }
+    else {
+      res.status(404).json({status: false, message: "User not found"});
+    }
+
+   
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: error.message });
   }
-};
+}
 
 // Mark Notification as Read
 export const markNotificationRead = async (req, res) => {
@@ -250,7 +229,7 @@ export const markNotificationRead = async (req, res) => {
    }
    else {
     await Notice.findOneAndUpdate({_id: id, isRead: { $nin: [userId]}},
-       {$push: {isRead: userId}},
+       {$push: {isRead: {$nin: [userId]}}},
        {new : true}
     );
    }
@@ -265,6 +244,7 @@ export const markNotificationRead = async (req, res) => {
 export const changeUserPassword = async (req, res) => {
   try {
     const { userId } = req.user;
+   
 
     const user = await User.findById(userId);
 
@@ -273,6 +253,7 @@ export const changeUserPassword = async (req, res) => {
 
      await user.save();
     }
+
 
     return res.status(200).json({ status: true, message: "Password changed successfully" });
   } catch (error) {
@@ -291,6 +272,7 @@ export const activateUserProfile = async (req, res) => {
  user.isActive = req.body.isActive;
 
  await user.save();
+
 
  res.status(201).json({
   status: true,
@@ -323,5 +305,3 @@ export const deleteUserProfile = async (req, res) => {
     return res.status(500).json({ status: false, message: error.message });
   }
 };
-
-
