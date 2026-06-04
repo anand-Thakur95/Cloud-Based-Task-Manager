@@ -4,7 +4,11 @@ const dbConnection = async () => {
 
     try {
         
-        await mongoose.connect(process.env.MONGODB_URL)
+        const uri = process.env.MONGODB_URL?.trim();
+        if (!uri) {
+            throw new Error("MONGODB_URL is not set in .env");
+        }
+        await mongoose.connect(uri)
 
         console.log("DB connected")
     } catch (error) {

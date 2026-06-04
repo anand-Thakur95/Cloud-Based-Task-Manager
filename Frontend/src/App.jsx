@@ -41,9 +41,14 @@ function Layout() {
 function App() {
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/Login" element={<Navigate to="/login" replace />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
       <Route element={<Layout />}>
-        <Route index path="/" element={<Navigate to="/dashboard" />} />
+        <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/Dashboard" element={<Navigate to="/dashboard" replace />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/completed/:status" element={<Tasks />} />
         <Route path="/in-progress/:status" element={<Tasks />} />
@@ -53,10 +58,6 @@ function App() {
         <Route path="/task/:id" element={<TaskDetails />} />
         <Route path="/profile" element={<Profile />} />
       </Route>
-
-      <Route path="/login" element={<Login />} />
-      <Route path="/Login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
     </Routes>
   );
 }

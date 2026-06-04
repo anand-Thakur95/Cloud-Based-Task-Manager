@@ -2,70 +2,88 @@ import User from "../model/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Notice from "../model/notification.js";
+import {
+  getMissingRequiredFields,
+  validationErrorResponse,
+  formatMongooseValidationError,
+} from "../utils/validateFields.js";
 
-// Register User
+const REGISTER_REQUIRED_FIELDS = ["name", "email", "password", "role", "title"];
+
+const createUserAccount = async (req, res, successMessage) => {
+  const { name, email, password, role, title, isAdmin } = req.body;
+
+  const missingFields = getMissingRequiredFields(
+    { name, email, password, role, title },
+    REGISTER_REQUIRED_FIELDS
+  );
+
+  if (missingFields.length > 0) {
+    return res.status(400).json(validationErrorResponse(missingFields));
+  }
+
+  const userExist = await User.findOne({ email });
+  if (userExist) {
+    return res.status(400).json({
+      status: false,
+      message: "User already exists",
+    });
+  }
+
+  const user = await User.create({
+    name,
+    email,
+    password,
+    role,
+    title,
+    isAdmin: Boolean(isAdmin),
+  });
+
+  user.password = undefined;
+
+  return res.status(201).json({
+    status: true,
+    message: successMessage,
+    user,
+  });
+};
+
+const handleCreateUserError = (error, res) => {
+  console.error("Create User Error:", error);
+
+  if (error.name === "ValidationError") {
+    return res.status(400).json(formatMongooseValidationError(error));
+  }
+
+  if (error.code === 11000) {
+    return res.status(400).json({
+      status: false,
+      message: "Email is required and must be unique",
+      missingFields: ["email"],
+    });
+  }
+
+  return res.status(500).json({
+    status: false,
+    message: "Server error",
+  });
+};
+
+// Public register (does not change admin session cookie)
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role, title, isAdmin } = req.body;
-
-    // 1️⃣ Validate required fields
-    if (!name || !email || !password || !role || !title) {
-      return res.status(400).json({
-        status: false,
-        message: "All fields are required",
-      });
-    }
-
-    // 2️⃣ Check if user already exists
-    const userExist = await User.findOne({ email });
-    if (userExist) {
-      return res.status(400).json({
-        status: false,
-        message: "User already exists",
-      });
-    }
-
-    // 3️⃣ Create user (password will be hashed by schema pre-save)
-    const user = await User.create({
-      name,
-      email,
-      password,
-      role,
-      title,
-      isAdmin: Boolean(isAdmin),
-    });
-
-    // 4️⃣ Generate JWT token (for ALL users)
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-
-    // 5️⃣ Set cookie (DEV + PROD safe)
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // true in prod
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    });
-
-    // 6️⃣ Remove password from response
-    user.password = undefined;
-
-    // 7️⃣ Send response
-    return res.status(201).json({
-      status: true,
-      message: "User registered successfully",
-      user,
-    });
-
+    return await createUserAccount(req, res, "User registered successfully");
   } catch (error) {
-    console.error("Register Error:", error);
-    return res.status(500).json({
-      status: false,
-      message: "Server error",
-    });
+    return handleCreateUserError(error, res);
+  }
+};
+
+// Admin adds team member — keeps current user logged in (no auth cookie set)
+export const createTeamMember = async (req, res) => {
+  try {
+    return await createUserAccount(req, res, "User added successfully");
+  } catch (error) {
+    return handleCreateUserError(error, res);
   }
 };
 
@@ -96,17 +114,16 @@ export const loginUser = async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET?.trim(),
       { expiresIn: "1d" }
     );
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: "none",
-      maxAge: 24 * 60 * 60 * 1000, // 1 days
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
-
 
     user.password = undefined;
 
@@ -134,6 +151,8 @@ export const logoutUser = async (req, res) => {
     res.cookie("token", "", {
       httpOnly: true,
       expires: new Date(0),
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     return res.status(200).json({ status: true, message: "Logout successful" });
@@ -160,12 +179,11 @@ export const getNotificationsList = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    const notic = await Notice.findOne({
-      team: userId,
-      isRead: { $nin: [userId]},
-    }).populate("task", "title");
-
-    
+    const notifications = await Notice.find({
+      team: { $in: [userId] },
+    })
+      .populate("task", "title")
+      .sort({ _id: -1 });
 
     return res.status(200).json({ status: true, notifications });
   } catch (error) {
@@ -180,8 +198,8 @@ export const updateUserProfile = async (req, res) => {
     const { userId, isAdmin } = req.user;
     const { _id } = req.body;
 
-   const id = 
-   isAdmin && userId === _id ? userId : isAdmin && userId !== _id ? _id : userId;
+   const id =
+     isAdmin && _id && String(userId) !== String(_id) ? _id : userId;
 
    const user = await User.findById(id)
 
@@ -192,9 +210,9 @@ export const updateUserProfile = async (req, res) => {
     user.role = req.body.role || user.role;
 
 
-    const updateUser = await User.save()
+    const updateUser = await user.save();
 
-    user.password = undefined;
+    updateUser.password = undefined;
 
     res.status(201).json({
       status: true,
@@ -222,15 +240,15 @@ export const markNotificationRead = async (req, res) => {
 
    if(isReadType=== "all") {
     await Notice.updateMany(
-      {team:userId, isRead: {$nin: [userId]}},
-       { $push: {isRead: userId}},
-       {new : true}
+      { team: { $in: [userId] }, isRead: { $nin: [userId] } },
+      { $push: { isRead: userId } }
     );
    }
    else {
-    await Notice.findOneAndUpdate({_id: id, isRead: { $nin: [userId]}},
-       {$push: {isRead: {$nin: [userId]}}},
-       {new : true}
+    await Notice.findOneAndUpdate(
+      { _id: id, isRead: { $nin: [userId] } },
+      { $push: { isRead: userId } },
+      { new: true }
     );
    }
     return res.status(200).json({ status: true, message: "Notification marked as read" });
@@ -285,6 +303,42 @@ export const activateUserProfile = async (req, res) => {
   else {
     res.status(404).json({status: false, message: "User not found"})
   }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Reset password by email (public, used by forgot-password page)
+export const forgotPassword = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const missingFields = getMissingRequiredFields(
+      { email, password },
+      ["email", "password"]
+    );
+
+    if (missingFields.length > 0) {
+      return res.status(400).json(validationErrorResponse(missingFields));
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: "No account found with this email",
+      });
+    }
+
+    user.password = password;
+    await user.save();
+
+    return res.status(200).json({
+      status: true,
+      message: "Password updated successfully",
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: error.message });

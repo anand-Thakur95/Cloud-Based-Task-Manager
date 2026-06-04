@@ -6,7 +6,7 @@ import { Dialog } from "@headlessui/react";
 import Textbox from "./Textbox";
 import Loading from "./Loading";
 import {Button} from "../components/ui/button";
-import { useRegisterMutation } from "../redux/slices/api/authApiSlice";
+import { useCreateTeamMemberMutation } from "../redux/slices/api/userApiSlice";
 import toast from "react-hot-toast";
 import { useUpdateUserMutation, useGetTeamListQuery } from "../redux/slices/api/userApiSlice"
 import { setCredentials } from "../redux/slices/authSlice";
@@ -23,7 +23,7 @@ const AddUser = ({ open, setOpen, userData }) => {
   } = useForm({ defaultValues });
 
   const dispatch = useDispatch()
-  const [addNewUser, { isLoading }] = useRegisterMutation();
+  const [addNewUser, { isLoading }] = useCreateTeamMemberMutation();
   const [updateUser, {isLoading : isUpdating}] = useUpdateUserMutation();
   const {refetch : refetchTeamList} = useGetTeamListQuery();
 
@@ -39,8 +39,9 @@ const AddUser = ({ open, setOpen, userData }) => {
         }
       } else {
         await addNewUser({
-          ...data, 
-          password: data.email
+          ...data,
+          password: data.email,
+          isAdmin: false,
         }).unwrap();
         toast.success("New User added successfully");
         refetchTeamList();
@@ -50,7 +51,13 @@ const AddUser = ({ open, setOpen, userData }) => {
       
     } catch (error) {
       console.error(error);
-      toast.error(error?.data?.message || "Failed to add user");
+      const missing = error?.data?.missingFields;
+      const message =
+        error?.data?.message ||
+        (Array.isArray(missing) && missing.length > 0
+          ? `Required: ${missing.join(", ")}`
+          : "Failed to add user");
+      toast.error(message);
     }
   };
 

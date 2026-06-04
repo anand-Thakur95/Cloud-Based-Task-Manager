@@ -3,14 +3,14 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new Schema(
   {
-    name: { type: String, required: true },
-    title: { type: String, required: true },
-    role: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: String, required: [true, "Name is required"] },
+    title: { type: String, required: [true, "Title is required"] },
+    role: { type: String, required: [true, "Role is required"] },
+    email: { type: String, required: [true, "Email is required"], unique: true },
+    password: { type: String, required: [true, "Password is required"] },
     isAdmin: { type: Boolean, required: true, default: false },
     tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
-    isActive: { type: Boolean, required: true, default: true },
+    isActive: { type: Boolean, default: true },
     resetPasswordToken: { type: String },
     resetPasswordExpire: { type: Date },
   },

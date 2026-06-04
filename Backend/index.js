@@ -11,6 +11,12 @@ import { routeNotFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
 dotenv.config();
 
+// Normalize .env values (trailing spaces break CORS, JWT, and MongoDB)
+for (const key of Object.keys(process.env)) {
+  if (typeof process.env[key] === "string") {
+    process.env[key] = process.env[key].trim();
+  }
+}
 
 const PORT = process.env.PORT || 3000
 
@@ -19,7 +25,7 @@ dbConnection();
 const app = express()
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL?.trim(),
     credentials: true,
 }))
 

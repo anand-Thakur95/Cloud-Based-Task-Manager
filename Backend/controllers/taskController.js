@@ -10,11 +10,10 @@ export const createTask = async (req, res) => {
     const task = await Task.create({
       title,
       team,
-      stage: stage.toLowerCase(),
+      stage: stage?.toLowerCase() || "todo",
       date,
-      priority: priority.toLowerCase(),
+      priority: priority?.toLowerCase() || "normal",
       assets,
-
     })
 
     let text = `New task "${task.title}" has been assigned to you`
@@ -48,49 +47,50 @@ export const duplicateTask = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
-    const task = await Task.findById(id);
+    const task = await Task.findById(id).lean();
 
-    const newTask = await Task.create({
-      ...task,
-      title: task.title + " - Duplicate",
-    });
-
-    newTask.team = task.team;
-    newTask.subTasks = task.subTasks;
-    newTask.assets = task.assets;
-    newTask.priority = task.priority;
-    newTask.stage = task.stage;
-
-
-    await newTask.save();
-
-    let text = `New task "${newTask.title}" has been assigned to you`
-    if (task.team.length > 1) {
-
-      text = text + `and ${task.team.length - 1} others`
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
     }
 
-    text =
-      text + `The task priority is set a ${task.priority
-      } priority, so check and act accordingly. The task date is ${task.date.toDateString()}. Thank you!!! `
+    const { _id, createdAt, updatedAt, __v, ...taskData } = task;
 
+    const newTask = await Task.create({
+      ...taskData,
+      title: `${task.title} - Duplicate`,
+      isTrashed: false,
+    });
 
-    const recipients = [...new Set([...(task.team || []).map((id) => id.toString()), userId.toString()])];
+    let text = `New task "${newTask.title}" has been assigned to you`;
+    if (task.team?.length > 1) {
+      text += ` and ${task.team.length - 1} others`;
+    }
+
+    text += ` The task priority is set a ${task.priority} priority, so check and act accordingly. The task date is ${new Date(task.date).toDateString()}. Thank you!!!`;
+
+    const recipients = [
+      ...new Set([
+        ...(task.team || []).map((memberId) => memberId.toString()),
+        userId.toString(),
+      ]),
+    ];
 
     await Notice.create({
       team: recipients,
       text,
-      task: task._id,
+      task: newTask._id,
     });
 
-    res.status(200).json({ status: true, message: "Task create successfully." });
-
+    res.status(200).json({
+      status: true,
+      task: newTask,
+      message: "Task duplicated successfully.",
+    });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({ status: false, message: error.message })
-
+    return res.status(400).json({ status: false, message: error.message });
   }
-}
+};
 
 export const postTaskActivity = async (req, res) => {
   try {
@@ -98,7 +98,11 @@ export const postTaskActivity = async (req, res) => {
     const { userId } = req.user;
     const { type, activity } = req.body;
 
-    const task = await Task.findById(id)
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
+    }
 
     const data = {
       type,
@@ -224,14 +228,19 @@ export const getTask = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findById(id).populate({
-      path: "team",
-      select: "name title role email",
+    const task = await Task.findById(id)
+      .populate({
+        path: "team",
+        select: "name title role email",
+      })
+      .populate({
+        path: "activities.by",
+        select: "name",
+      });
 
-    }).populate({
-      path: "activities.by",
-      select: "name",
-    }).sort({ _id: -1 })
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
+    }
 
     res.status(200).json({
       status: true,
@@ -256,6 +265,10 @@ export const createSubTask = async (req, res) => {
     };
     const task = await Task.findById(id);
 
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
+    }
+
     task.subTasks.push(newSubTask);
 
     await task.save();
@@ -276,18 +289,22 @@ export const updateTask = async (req, res) => {
 
     const task = await Task.findById(id);
 
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
+    }
+
     task.title = title;
     task.date = date;
-    task.priority = priority.toLowerCase();
+    if (priority) task.priority = priority.toLowerCase();
     task.assets = assets;
-    task.stage = stage.toLowerCase();
+    if (stage) task.stage = stage.toLowerCase();
     task.team = team;
 
     await task.save();
 
     res
       .status(200)
-      .json({ status: true, message: "Task duplicated successfully." });
+      .json({ status: true, message: "Task updated successfully." });
   } catch (error) {
     console.log(error);
     return res.status(400).json({ status: false, message: error.message });
@@ -299,6 +316,10 @@ export const trashTask = async (req, res) => {
     const { id } = req.params;
 
     const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({ status: false, message: "Task not found" });
+    }
 
     task.isTrashed = true;
 

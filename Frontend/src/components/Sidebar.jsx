@@ -1,6 +1,5 @@
 import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users,TableOfContents, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-import Dashboard from "../pages/Dashboard"
 import { useNavigate } from 'react-router-dom';
 import { MdDashboard } from "react-icons/md";
 import {
@@ -19,7 +18,7 @@ import {
 const items = [
   { title: "Tasks", url: "/tasks", icon: TableOfContents },
   { title: "Complete", url: "/completed/completed", icon: CircleCheckBig },
-  { title: "In Process", url: "/in-progress/in%20progress", icon: ClipboardClock },
+  { title: "In Process", url: "/in-progress/in progress", icon: ClipboardClock },
   { title: "To Do", url: "/todo/todo", icon: ClipboardCheck },
   { title: "Team", url: "/team", icon: Users },
   { title: "Trash", url: "/trashed", icon: Trash2 },
@@ -33,7 +32,7 @@ export function AppSidebar() {
     
       <Sidebar className="flex left-0 right-0 top-15">
         <SidebarHeader className="flex flex-row items-center text-2xl text-blue-500 gap-2 cursor-pointer"
-        onClick={() => navigate('/Dashboard')}
+        onClick={() => navigate('/dashboard')}
         >
           <MdDashboard />
           <p className="font-bold">Dashboard</p>
@@ -58,9 +57,11 @@ export function AppSidebar() {
             );
           })}
         </SidebarMenu>
-     <SidebarFooter className="absolute flex flex-row bottom-17  gap-1 ">
-      <Settings />
-      <span>Setting</span> 
+     <SidebarFooter className="absolute flex flex-row bottom-17 gap-1 cursor-pointer">
+      <Link to="/profile" className="flex flex-row items-center gap-1">
+        <Settings />
+        <span>Settings</span>
+      </Link>
      </SidebarFooter>
       </Sidebar>
    

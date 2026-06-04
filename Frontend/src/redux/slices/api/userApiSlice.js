@@ -6,6 +6,15 @@ const USER_URL = "/user"
 
 export const userApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    createTeamMember: builder.mutation({
+      query: (data) => ({
+        url: `${USER_URL}/add-team`,
+        method: "POST",
+        body: data,
+        credentials: "include",
+      }),
+    }),
+
     updateUser: builder.mutation({
       query: (data) => ({
         url: `${USER_URL}/profile`,
@@ -71,4 +80,4 @@ export const userApiSlice = apiSlice.injectEndpoints({
 });
   
 
-  export const { useUpdateUserMutation, useGetTeamListQuery, useDeleteUserMutation, useUserActionMutation, useGetNotificationsQuery, useMarkNotiAsReadMutation, useChangePasswordMutation } = userApiSlice
+  export const { useCreateTeamMemberMutation, useUpdateUserMutation, useGetTeamListQuery, useDeleteUserMutation, useUserActionMutation, useGetNotificationsQuery, useMarkNotiAsReadMutation, useChangePasswordMutation } = userApiSlice

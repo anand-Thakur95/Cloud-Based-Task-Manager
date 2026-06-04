@@ -1,6 +1,7 @@
 import { Popover, Transition } from "@headlessui/react";
 import moment from "moment";
 import { Fragment, useState, useEffect, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { BiSolidMessageRounded } from "react-icons/bi";
 import { HiBellAlert } from "react-icons/hi2";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -19,8 +20,8 @@ const ICONS = {
 
 const Notifications= () => {
   const [selected, setSelected] = useState(null);
+  const { user } = useSelector((state) => state.auth);
 
-  
   const { data, refetch, isLoading } = useGetNotificationsQuery(undefined, {
     pollingInterval: 30000,
     refetchOnFocus: true,
@@ -74,6 +75,12 @@ const Notifications= () => {
     return [];
   }, [data]);
 
+  const isUnread = (item) => {
+    if (!user?._id) return false;
+    const readBy = item?.isRead || [];
+    return !readBy.some((id) => String(id) === String(user._id));
+  };
+
   const unreadCount = useMemo(() => {
     const backendCount =
       data?.unreadCount ??
@@ -85,11 +92,8 @@ const Notifications= () => {
 
     if (typeof backendCount === "number") return backendCount;
 
-    const byIsReadByMe = notifications.filter((item) => !item?.isReadByMe).length;
-    if (byIsReadByMe > 0) return byIsReadByMe;
-    const byIsRead = notifications.filter((item) => !item?.isRead).length;
-    return byIsRead || notifications.length;
-  }, [data, notifications]);
+    return notifications.filter(isUnread).length;
+  }, [data, notifications, user?._id]);
 
   return (
     <>
