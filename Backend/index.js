@@ -2,12 +2,11 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import morgan from "morgan";
-import dbConnection from "./utils/connection.js";
+import dbConnection, { isDbConnected } from "./utils/connection.js";
 import cors from "cors";
 import routes from "./routes/index.js";
 import { routeNotFound, errorHandler } from "./middlewares/errorMiddleware.js";
-
-
+import { requireDbConnection } from "./middlewares/dbMiddleware.js";
 
 dotenv.config();
 
@@ -18,26 +17,46 @@ for (const key of Object.keys(process.env)) {
   }
 }
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3000;
 
-dbConnection();
+const app = express();
 
-const app = express()
-
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.FRONTEND_URL?.trim(),
     credentials: true,
-}))
+  })
+);
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser())
-app.use(morgan("dev"));
-app.use("/api", routes)
+app.use(cookieParser());
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
+app.get("/api/health", (req, res) => {
+  res.status(isDbConnected() ? 200 : 503).json({
+    status: isDbConnected(),
+    message: isDbConnected() ? "OK" : "Database not connected",
+  });
+});
 
-app.use(routeNotFound)
-app.use(errorHandler)
+app.use("/api", requireDbConnection, routes);
 
-app.listen(PORT, ()=> console.log(`server running on port ${PORT}`))
+app.use(routeNotFound);
+app.use(errorHandler);
+
+const startServer = async () => {
+  try {
+    await dbConnection();
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
