@@ -39,8 +39,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/", (req, res) => res.json({ status: true, message: "Server running" }));
-
+app.use("/api", requireDbConnection, routes);  
 app.use(routeNotFound);
 app.use(errorHandler);
-
 export default app;
