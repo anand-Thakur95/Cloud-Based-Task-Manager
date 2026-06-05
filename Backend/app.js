@@ -18,9 +18,17 @@ for (const key of Object.keys(process.env)) {
 
 const app = express();
 
+const allowedOrigins = [process.env.FRONTEND_URL?.trim()].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL?.trim(),
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy: origin ${origin} not allowed`));
+      }
+    },
     credentials: true,
   })
 );
