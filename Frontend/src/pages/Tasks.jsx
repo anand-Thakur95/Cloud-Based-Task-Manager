@@ -5,19 +5,19 @@ import { MdGridView } from 'react-icons/md'
 import Loading from '../components/Loading.jsx';
 import { useParams } from 'react-router-dom';
 import Title from "../components/Title.jsx"
-import {Button } from "../components/ui/button.jsx"
+import { Button } from "../components/ui/button.jsx"
 import Tabs from '../components/Tabs.jsx';
 import TaskTitle from '../components/TaskTitle.jsx';
 import BoarderView from '../components/BoardView.jsx';
-
 import Table from '../components/task/Table.jsx';
 import AddTask from '../components/task/AddTask.jsx';
 import { useGetAllTasksQuery } from '../redux/slices/api/taskApiSlice.js';
-
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 
 const TABS = [
-  {title:"Board View", icon:<MdGridView/>},
-  {title: "List View", icon: <FaList/>}
+  { title: "Board View", icon: <MdGridView /> },
+  { title: "List View", icon: <FaList /> }
 ];
 
 const TASK_TYPE = {
@@ -25,19 +25,33 @@ const TASK_TYPE = {
   "in progress": "bg-yellow-600",
   completed: "bg-green-600",
 };
+
 const Tasks = () => {
   const params = useParams();
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(user?.isAdmin || user?.role === "Admin" || user?.role?.toLowerCase() === "admin");
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
-  
 
   const status = params?.status || "";
-const {data, isLoading, refetch} = useGetAllTasksQuery({
-strQuery: status,
-isTrashed: "",
-search: "",
-});
+  const { data, isLoading, refetch } = useGetAllTasksQuery({
+    strQuery: status,
+    isTrashed: "",
+    search: "",
+  });
+
+  const handleCreateTask = () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can create tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    setOpen(true);
+  };
+
   return isLoading ? (
     <div className='py-20'>
       <Loading />
@@ -47,9 +61,10 @@ search: "",
       <div className='flex items-center justify-between mb-4'>
         <Title title={status ? `${status} Tasks` : "Tasks"} />
 
+        {/* Show button to all, but only admin can open the modal */}
         {!status && (
           <Button
-            onClick={() => setOpen(true)}
+            onClick={handleCreateTask}
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white hover:bg-blue-500 rounded-md py-2 2xl:py-2.5'
           >
             <span>Create Task</span>
@@ -58,32 +73,30 @@ search: "",
         )}
       </div>
 
-{/* Tabs  */}
-<div>
-<Tabs tabs={TABS}  setSelected={setSelected}>
- {
-  !status && (
-    <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4 rounded-md'>
-      <TaskTitle label="To Do" className={TASK_TYPE.todo} />
-      <TaskTitle label="In Progress" className={TASK_TYPE["in progress"]} />
-      <TaskTitle label="Completed" className={TASK_TYPE.completed} />
+      {/* Tabs */}
+      <div>
+        <Tabs tabs={TABS} setSelected={setSelected}>
+          {!status && (
+            <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4 rounded-md'>
+              <TaskTitle label="To Do" className={TASK_TYPE.todo} />
+              <TaskTitle label="In Progress" className={TASK_TYPE["in progress"]} />
+              <TaskTitle label="Completed" className={TASK_TYPE.completed} />
+            </div>
+          )}
+          {selected === 0 ? (
+            <BoarderView tasks={data?.tasks} />
+          ) : (
+            <div className='w-full'>
+              <Table tasks={data?.tasks} />
+            </div>
+          )}
+        </Tabs>
+      </div>
 
-    </div>
- )}
-{selected === 0 ? <BoarderView tasks={data?.tasks}/>
- :
- <div className='w-full'>
-  
-  <Table tasks={data?.tasks}/>
-
-  </div>}
-</Tabs>
- 
-</div>
-
+      {/* AddTask modal — only admin can reach this (open is only set true for admin) */}
       <AddTask open={open} setOpen={setOpen} onTaskSaved={refetch} />
-   
-</div>
-  )
-}
+    </div>
+  );
+};
+
 export default Tasks;

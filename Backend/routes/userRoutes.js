@@ -2,6 +2,8 @@ import express from "express";
 import { isAdminRoute, protectRoute } from "../middlewares/authMiddleware.js";
 import {
   registerUser,
+  getAdminInfo,
+  makeAdmin,
   createTeamMember,
   loginUser,
   logoutUser,
@@ -21,6 +23,8 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/forgot-password", forgotPassword);
+router.get("/admin-info", getAdminInfo);
+router.post("/make-admin", makeAdmin);
 
 
 router.post("/add-team", protectRoute, isAdminRoute, createTeamMember);

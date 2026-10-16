@@ -23,7 +23,7 @@ const protectRoute = async (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET?.trim());
 
     const resp = await User.findById(decodedToken.userId).select(
-      "isAdmin email isActive"
+      "isAdmin email isActive role"
     );
 
     if (!resp || !resp.isActive) {
@@ -34,9 +34,16 @@ const protectRoute = async (req, res, next) => {
       });
     }
 
+    const isUserAdmin = Boolean(
+      resp.isAdmin ||
+      resp.role === "Admin" ||
+      resp.role?.toLowerCase() === "admin"
+    );
+
     req.user = {
       email: resp.email,
-      isAdmin: resp.isAdmin,
+      isAdmin: isUserAdmin,
+      role: resp.role,
       userId: decodedToken.userId,
     };
 

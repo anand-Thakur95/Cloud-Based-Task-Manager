@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Title from "../components/Title.jsx";
 import { IoMdAdd } from "react-icons/io";
 import { getInitials } from "../utils";
@@ -14,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 
 const Users = () => {
+  const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [open, setOpen] = useState(false);
   const [openAction, setOpenAction] = useState(false);
@@ -72,9 +74,9 @@ const Users = () => {
     setOpenDialog(true);
   };
 
+  // Navigate admin to Profile page with the target user's ID
   const editClick = (user) => {
-    setSelected(user);
-    setOpen(true);
+    navigate(`/profile?userId=${user._id}`);
   };
 
   const userStatusClick = (user) => {

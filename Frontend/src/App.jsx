@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Tasks from "./pages/Tasks";
 import TaskDetails from "./pages/TaskDetails";
 import Dashboard from "./pages/Dashboard";
@@ -13,6 +14,17 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AppSidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { SidebarProvider } from "./components/ui/sidebar";
+
+// Guard: redirects non-admin users to /dashboard
+function AdminRoute() {
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
+  return isAdmin ? <Outlet /> : <Navigate to="/dashboard" replace />;
+}
 
 function Layout() {
   const { user } = useSelector((state) => state.auth);
@@ -43,6 +55,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/Login" element={<Navigate to="/login" replace />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
 
       <Route element={<Layout />}>
@@ -53,13 +66,18 @@ function App() {
         <Route path="/completed/:status" element={<Tasks />} />
         <Route path="/in-progress/:status" element={<Tasks />} />
         <Route path="/todo/:status" element={<Tasks />} />
-        <Route path="/team" element={<Users />} />
         <Route path="/trashed" element={<Trash />} />
         <Route path="/task/:id" element={<TaskDetails />} />
         <Route path="/profile" element={<Profile />} />
+
+        {/* Admin-only routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/team" element={<Users />} />
+        </Route>
       </Route>
     </Routes>
   );
 }
 
 export default App;
+

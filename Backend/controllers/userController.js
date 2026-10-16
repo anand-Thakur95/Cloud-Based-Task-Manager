@@ -8,13 +8,15 @@ import {
   formatMongooseValidationError,
 } from "../utils/validateFields.js";
 
-const REGISTER_REQUIRED_FIELDS = ["name", "email", "password", "role", "title"];
+const REGISTER_REQUIRED_FIELDS = ["name", "email", "password"];
 
 const createUserAccount = async (req, res, successMessage) => {
-  const { name, email, password, role, title, isAdmin } = req.body;
+  const { name, email, password, isAdmin } = req.body;
+  const role = req.body.role || "Member";
+  const title = req.body.title || "Team Member";
 
   const missingFields = getMissingRequiredFields(
-    { name, email, password, role, title },
+    { name, email, password },
     REGISTER_REQUIRED_FIELDS
   );
 
@@ -72,9 +74,81 @@ const handleCreateUserError = (error, res) => {
 // Public register (does not change admin session cookie)
 export const registerUser = async (req, res) => {
   try {
+    // Guard: if someone tries to register as admin but one already exists, reject it
+    if (
+      req.body.isAdmin === true ||
+      req.body.isAdmin === "true" ||
+      req.body.role === "Admin" ||
+      req.body.role?.toLowerCase() === "admin"
+    ) {
+      const existingAdmin = await User.findOne({
+        $or: [{ isAdmin: true }, { role: "Admin" }, { role: "admin" }],
+      });
+      if (existingAdmin) {
+        return res.status(400).json({
+          status: false,
+          message: "An admin already exists. You can only register as a User.",
+        });
+      }
+    }
     return await createUserAccount(req, res, "User registered successfully");
   } catch (error) {
     return handleCreateUserError(error, res);
+  }
+};
+
+// Public: check if an admin exists and return their name (used on register page)
+export const getAdminInfo = async (req, res) => {
+  try {
+    const admin = await User.findOne({
+      $or: [{ isAdmin: true }, { role: "Admin" }, { role: "admin" }],
+    }).select("name");
+    if (admin) {
+      return res.status(200).json({ status: true, hasAdmin: true, adminName: admin.name });
+    }
+    return res.status(200).json({ status: true, hasAdmin: false, adminName: null });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
+// Public: promote a user to admin by email — only works when NO admin exists yet
+export const makeAdmin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ status: false, message: "Email and password are required" });
+    }
+
+    // Only allowed if no admin exists yet
+    const existingAdmin = await User.findOne({ isAdmin: true });
+    if (existingAdmin) {
+      return res.status(400).json({ status: false, message: "An admin already exists." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found with this email." });
+    }
+
+    // Verify password before promoting
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ status: false, message: "Incorrect password." });
+    }
+
+    user.isAdmin = true;
+    user.title = user.title || "Administrator";
+    user.role = user.role || "Admin";
+    await user.save();
+
+    return res.status(200).json({
+      status: true,
+      message: `${user.name} has been promoted to Admin successfully. Please log in again.`,
+    });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -92,8 +166,8 @@ export const createTeamMember = async (req, res) => {
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }); 
+    console.log("RECEIVED:", JSON.stringify({ email, password }));
 
     if (!user) {
       return res.status(401).json({ status: false, message: "Invalid email or password" });
@@ -125,6 +199,17 @@ export const loginUser = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
+    const isUserAdmin = Boolean(
+      user.isAdmin ||
+      user.role === "Admin" ||
+      user.role?.toLowerCase() === "admin"
+    );
+
+    if (isUserAdmin && !user.isAdmin) {
+      user.isAdmin = true;
+      await user.save();
+    }
+
     user.password = undefined;
 
     return res.status(200).json({
@@ -134,7 +219,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        isAdmin: user.isAdmin,
+        isAdmin: isUserAdmin,
         role: user.role,
         title: user.title,
       },
@@ -198,38 +283,41 @@ export const updateUserProfile = async (req, res) => {
     const { userId, isAdmin } = req.user;
     const { _id } = req.body;
 
-   const id =
-     isAdmin && _id && String(userId) !== String(_id) ? _id : userId;
+    const id =
+      isAdmin && _id && String(userId) !== String(_id) ? _id : userId;
 
-   const user = await User.findById(id)
+    const user = await User.findById(id);
 
-   if(user) {
-     
-    user.name = req.body.name || user.name;
-    user.title = req.body.title || user.title;
-    user.role = req.body.role || user.role;
+    if (user) {
+      user.name  = req.body.name  || user.name;
+      user.title = req.body.title || user.title;
+      user.role  = req.body.role  || user.role;
+      if (req.body.email) user.email = req.body.email;
 
+      const updatedUser = await user.save();
+      updatedUser.password = undefined;
 
-    const updateUser = await user.save();
-
-    updateUser.password = undefined;
-
-    res.status(201).json({
-      status: true,
-      message: "Profile Update Successfully",
-      user: updateUser,
-    });
-  }
-    else {
-      res.status(404).json({status: false, message: "User not found"});
+      res.status(201).json({
+        status: true,
+        message: "Profile Updated Successfully",
+        user: {
+          _id:     updatedUser._id,
+          name:    updatedUser.name,
+          email:   updatedUser.email,
+          title:   updatedUser.title,
+          role:    updatedUser.role,
+          isAdmin: updatedUser.isAdmin,   // always include so Redux stays in sync
+          isActive:updatedUser.isActive,
+        },
+      });
+    } else {
+      res.status(404).json({ status: false, message: "User not found" });
     }
-
-   
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: false, message: error.message });
   }
-}
+};
 
 // Mark Notification as Read
 export const markNotificationRead = async (req, res) => {

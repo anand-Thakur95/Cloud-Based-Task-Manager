@@ -38,6 +38,15 @@ export const authApiSlice = apiSlice.injectEndpoints({
         credentials: "include",
       }),
     }),
+
+    // Check if an admin exists — public, used on the Register page
+    getAdminInfo: builder.query({
+      query: () => ({
+        url: `${AUTH_URL}/admin-info`,
+        method: "GET",
+        credentials: "include",
+      }),
+    }),
   }),
 });
 
@@ -46,4 +55,6 @@ export const {
   useRegisterMutation,
   useLogoutMutation,
   useForgotPasswordMutation,
+  useGetAdminInfoQuery,
 } = authApiSlice
+

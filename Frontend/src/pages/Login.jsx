@@ -11,9 +11,13 @@ function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const { register, handleSubmit, watch } = useForm();
-  const [login] = useLoginMutation();
-  const isLoading = false;
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const [login, { isLoading }] = useLoginMutation();
 
   const emailValue = watch('email') || '';
   const forgotPath = emailValue
@@ -24,6 +28,8 @@ function Login() {
     try {
       const result = await login(data).unwrap();
 
+      // Clear any stale session first, then set fresh data from server
+      localStorage.removeItem("userInfo");
       dispatch(setCredentials(result.user));
       navigate('/dashboard', { replace: true });
       toast.success('Login successful');
@@ -68,21 +74,31 @@ function Login() {
               Keep all your credentials safe!
             </p>
             <div className='flex flex-col gap-y-4 sm:gap-y-5'>
-              <input
-                name='email'
-                type='email'
-                placeholder='Enter email...'
-                {...register('email', { required: 'Email is required' })}
-                className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
-              />
+              <div className='flex flex-col gap-y-1'>
+                <input
+                  name='email'
+                  type='email'
+                  placeholder='Enter email...'
+                  {...register('email', { required: 'Email is required' })}
+                  className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
+                />
+                {errors.email && (
+                  <span className='text-red-500 text-xs sm:text-sm pl-2'>{errors.email.message}</span>
+                )}
+              </div>
 
-              <input
-                name='password'
-                placeholder='Enter password...'
-                type='password'
-                {...register('password', { required: 'Password is required' })}
-                className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
-              />
+              <div className='flex flex-col gap-y-1'>
+                <input
+                  name='password'
+                  placeholder='Enter password...'
+                  type='password'
+                  {...register('password', { required: 'Password is required' })}
+                  className='w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-full border border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
+                />
+                {errors.password && (
+                  <span className='text-red-500 text-xs sm:text-sm pl-2'>{errors.password.message}</span>
+                )}
+              </div>
 
               <span className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
                 <Link to={forgotPath} className='text-blue-600 hover:text-blue-700 text-sm sm:text-base'>
@@ -100,6 +116,12 @@ function Login() {
                 Sign In
               </button>
             )}
+            <p className='text-center text-sm text-gray-600 dark:text-gray-400'>
+              Don&apos;t have an account?{' '}
+              <Link to='/register' className='text-blue-600 hover:text-blue-700 font-medium'>
+                Sign Up
+              </Link>
+            </p>
           </form>
         </div>
       </div>

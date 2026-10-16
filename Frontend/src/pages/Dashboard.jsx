@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { clsx } from "clsx";
 import moment from "moment";
 import { FaNewspaper } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
 import { LuClipboardPen } from "react-icons/lu";
+import { IoMdAdd } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 import {
   MdAdminPanelSettings,
@@ -13,6 +15,8 @@ import {
 } from "react-icons/md";
 import { Chart } from "../components/Chart";
 import { useGetDashboardStatsQuery } from "../redux/slices/api/taskApiSlice";
+import AddTask from "../components/task/AddTask";
+import { Button } from "../components/ui/button";
 
 const TaskTable = ({ tasks = [] }) => {
   const ICONS = {
@@ -201,7 +205,9 @@ const UserTable = ({ users }) => {
 };
 
 function Dashboard() {
-  const { data, isLoading } = useGetDashboardStatsQuery();
+  const { data, isLoading, refetch } = useGetDashboardStatsQuery();
+  const [openAddTask, setOpenAddTask] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
  
   
@@ -269,6 +275,21 @@ function Dashboard() {
 
   return (
     <div className="relative top-16 h-full py-4 px-3 sm:px-4 md:px-5 lg:px-6 w-full">
+
+      {/* Dashboard header with Admin Add Task button */}
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
+        {Boolean(user?.isAdmin || user?.role === "Admin" || user?.role?.toLowerCase() === "admin") && (
+          <Button
+            onClick={() => setOpenAddTask(true)}
+            className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white hover:bg-blue-500 rounded-md py-2 2xl:py-2.5"
+          >
+            <span>Add Task</span>
+            <IoMdAdd className="text-lg" />
+          </Button>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
         {stats.map(({ icon, label, total, bg }, index) => (
           <Card key={index} icon={icon} bg={bg} label={label} count={total} />
@@ -290,6 +311,13 @@ function Dashboard() {
           <UserTable users={data?.users || []} />
         </div>
       </div>
+
+      {/* Add Task Modal — admin only */}
+      <AddTask
+        open={openAddTask}
+        setOpen={setOpenAddTask}
+        onTaskSaved={refetch}
+      />
     </div>
   );
 }
