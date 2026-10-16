@@ -19,7 +19,7 @@ const items = [
   { title: "In Process",  url: "/in-progress/in progress", icon: ClipboardClock  },
   { title: "To Do",       url: "/todo/todo",               icon: ClipboardCheck  },
   { title: "Team",        url: "/team",                    icon: Users,  adminOnly: true },
-  { title: "Trash",       url: "/trashed",                 icon: Trash2          },
+  { title: "Trash",       url: "/trashed",                 icon: Trash2, adminOnly: true },
 ];
 
 export function AppSidebar() {
@@ -33,9 +33,9 @@ export function AppSidebar() {
   );
 
   const handleNavClick = (item) => {
-    // Block non-admin from Team page
+    // Block non-admin from admin-only pages (Team, Trash)
     if (item.adminOnly && !isAdmin) {
-      toast.error("Access denied! Only Admin can view the Team page.", {
+      toast.error(`Access denied! Only Admin can view the ${item.title} page.`, {
         position: "top-center",
         autoClose: 3000,
       });

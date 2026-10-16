@@ -17,6 +17,7 @@ import { Chart } from "../components/Chart";
 import { useGetDashboardStatsQuery } from "../redux/slices/api/taskApiSlice";
 import AddTask from "../components/task/AddTask";
 import { Button } from "../components/ui/button";
+import { toast } from "react-toastify";
 
 const TaskTable = ({ tasks = [] }) => {
   const ICONS = {
@@ -273,21 +274,36 @@ function Dashboard() {
     );
   }
 
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
+
+  const handleAddTask = () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can create tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    setOpenAddTask(true);
+  };
+
   return (
     <div className="relative top-16 h-full py-4 px-3 sm:px-4 md:px-5 lg:px-6 w-full">
 
-      {/* Dashboard header with Admin Add Task button */}
+      {/* Dashboard header with Add Task button */}
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
-        {Boolean(user?.isAdmin || user?.role === "Admin" || user?.role?.toLowerCase() === "admin") && (
-          <Button
-            onClick={() => setOpenAddTask(true)}
-            className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white hover:bg-blue-500 rounded-md py-2 2xl:py-2.5"
-          >
-            <span>Add Task</span>
-            <IoMdAdd className="text-lg" />
-          </Button>
-        )}
+        <Button
+          onClick={handleAddTask}
+          className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white hover:bg-blue-500 rounded-md py-2 2xl:py-2.5"
+        >
+          <span>Add Task</span>
+          <IoMdAdd className="text-lg" />
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">

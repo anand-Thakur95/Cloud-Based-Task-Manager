@@ -14,9 +14,17 @@ import {
   useDuplicateTaskMutation,
   useTrashTaskMutation,
 } from "../../redux/slices/api/taskApiSlice.js";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 const TaskDialog = ({ task }) => {
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
+
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -71,17 +79,44 @@ const TaskDialog = ({ task }) => {
     {
       label: "Edit",
       icon: <MdOutlineEdit className="mr-2 h-5 w-5" aria-hidden="true" />,
-      onClick: () => setOpenEdit(true),
+      onClick: () => {
+        if (!isAdmin) {
+          toast.error("Access denied! Only Admin can edit tasks.", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          return;
+        }
+        setOpenEdit(true);
+      },
     },
     {
       label: "Add Sub-Task",
       icon: <MdAdd className="mr-2 h-5 w-5" aria-hidden="true" />,
-      onClick: () => setOpen(true),
+      onClick: () => {
+        if (!isAdmin) {
+          toast.error("Access denied! Only Admin can add sub-tasks.", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          return;
+        }
+        setOpen(true);
+      },
     },
     {
       label: "Duplicate",
       icon: <HiDuplicate className="mr-2 h-5 w-5" aria-hidden="true" />,
-      onClick: () => duplicateHandler(),
+      onClick: () => {
+        if (!isAdmin) {
+          toast.error("Access denied! Only Admin can duplicate tasks.", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          return;
+        }
+        duplicateHandler();
+      },
     },
   ];
 
@@ -125,7 +160,16 @@ const TaskDialog = ({ task }) => {
                 <Menu.Item>
                   {({ active }) => (
                     <button
-                      onClick={() => deleteClicks()}
+                      onClick={() => {
+                        if (!isAdmin) {
+                          toast.error("Access denied! Only Admin can delete tasks.", {
+                            position: "top-center",
+                            autoClose: 3000,
+                          });
+                          return;
+                        }
+                        deleteClicks();
+                      }}
                       className={`${
                         active ? "bg-blue-500 text-white" : "text-red-900"
                       } group flex w-full items-center rounded-md px-2 py-2 text-sm`}

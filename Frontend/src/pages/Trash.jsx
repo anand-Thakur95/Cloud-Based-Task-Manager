@@ -16,6 +16,8 @@ import {
   useDeleteRestoreTaskMutation,
   useGetAllTasksQuery,
 } from "../redux/slices/api/taskApiSlice";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -71,6 +73,13 @@ const TableRow = ({ item, onRestore, onDelete }) => (
 );
 
 const Trash = () => {
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
+
   const [openDialog, setOpenDialog] = useState(false);
   const [msg, setMsg] = useState(null);
   const [type, setType] = useState("delete");
@@ -85,6 +94,13 @@ const Trash = () => {
   const [deleteRestoreTask] = useDeleteRestoreTaskMutation();
 
   const deleteRestoreHandler = async () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can manage the trash.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
     try {
       await deleteRestoreTask({ id: selected, actionType: type }).unwrap();
     } catch (error) {
@@ -95,18 +111,39 @@ const Trash = () => {
   };
 
   const deleteAllClick = () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can manage the trash.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
     setType("deleteAll");
     setMsg("Do you want to permanently delete all items?");
     setOpenDialog(true);
   };
 
   const restoreAllClick = () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can manage the trash.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
     setType("restoreAll");
     setMsg("Do you want to restore all items in the trash?");
     setOpenDialog(true);
   };
 
   const deleteClick = (id) => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can delete tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
     setType("delete");
     setSelected(id);
     setMsg("Do you want to permanently delete this item?");
@@ -114,6 +151,13 @@ const Trash = () => {
   };
 
   const restoreClick = (id) => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can restore tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
     setSelected(id);
     setType("restore");
     setMsg("Do you want to restore the selected item?");

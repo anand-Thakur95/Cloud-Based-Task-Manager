@@ -14,6 +14,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import AppSidebar from "./components/Sidebar";
 import Navbar from "./components/Navbar";
 import { SidebarProvider } from "./components/ui/sidebar";
+import { toast } from "react-toastify";
 
 // Guard: redirects non-admin users to /dashboard
 function AdminRoute() {
@@ -23,6 +24,16 @@ function AdminRoute() {
     user?.role === "Admin" ||
     user?.role?.toLowerCase() === "admin"
   );
+
+  React.useEffect(() => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can access this page.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    }
+  }, [isAdmin]);
+
   return isAdmin ? <Outlet /> : <Navigate to="/dashboard" replace />;
 }
 
@@ -66,13 +77,13 @@ function App() {
         <Route path="/completed/:status" element={<Tasks />} />
         <Route path="/in-progress/:status" element={<Tasks />} />
         <Route path="/todo/:status" element={<Tasks />} />
-        <Route path="/trashed" element={<Trash />} />
         <Route path="/task/:id" element={<TaskDetails />} />
         <Route path="/profile" element={<Profile />} />
 
         {/* Admin-only routes */}
         <Route element={<AdminRoute />}>
           <Route path="/team" element={<Users />} />
+          <Route path="/trashed" element={<Trash />} />
         </Route>
       </Route>
     </Routes>

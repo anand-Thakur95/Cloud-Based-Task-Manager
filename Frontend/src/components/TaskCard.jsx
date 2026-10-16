@@ -14,7 +14,7 @@ import { FaList } from "react-icons/fa";
 import UserInfo from "./UserInfo";
 import { IoMdAdd } from "react-icons/io";
 import AddSubTask from "./task/AddSubTask";
-
+import { toast } from "react-toastify";
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -24,7 +24,23 @@ const ICONS = {
 
 const TaskCard = ({ task }) => {
   const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
   const [open, setOpen] = useState(false);
+
+  const handleAddSubTask = () => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can add sub-tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    setOpen(true);
+  };
 
   return (
     <>
@@ -40,7 +56,7 @@ const TaskCard = ({ task }) => {
             <span className='uppercase'>{task?.priority} Priority</span>
           </div>
 
-          {user?.isAdmin && <TaskDialog task={task} />}
+          <TaskDialog task={task} />
         </div>
 
         <>
@@ -113,9 +129,8 @@ const TaskCard = ({ task }) => {
 
         <div className='w-full pb-2'>
           <button
-            onClick={() => setOpen(true)}
-            disabled={user.isAdmin ? false : true}
-            className='w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300'
+            onClick={handleAddSubTask}
+            className='w-full flex gap-4 items-center text-sm text-gray-500 font-semibold hover:text-blue-600 transition-colors'
           >
             <IoMdAdd className='text-lg' />
             <span>ADD SUBTASK</span>

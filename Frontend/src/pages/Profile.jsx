@@ -23,6 +23,15 @@ const Profile = () => {
   );
   const isEditingOther = isAdmin && targetUserId && targetUserId !== loggedInUser?._id;
 
+  useEffect(() => {
+    if (targetUserId && targetUserId !== loggedInUser?._id && !isAdmin) {
+      toast.error("Access denied! Only Admin can edit other users' profiles.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    }
+  }, [targetUserId, loggedInUser?._id, isAdmin]);
+
   // Fetch team list so admin can find the target user's data
   const { data: teamData } = useGetTeamListQuery(undefined, {
     skip: !isEditingOther,

@@ -14,6 +14,7 @@ import ConfirmatioDialog from "../Dialogs";
 import { Button } from "../ui/button.jsx"
 import UserInfo from "../UserInfo"
 import { useTrashTaskMutation } from '../../redux/slices/api/taskApiSlice';
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import AddTask from "./AddTask";
 const ICONS = {
@@ -23,24 +24,45 @@ const ICONS = {
 };
 
 const Table = ({ tasks }) => {
+  const { user } = useSelector((state) => state.auth);
+  const isAdmin = Boolean(
+    user?.isAdmin ||
+    user?.role === "Admin" ||
+    user?.role?.toLowerCase() === "admin"
+  );
+
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
-const [openEdit, setOpenEdit] = useState(false);
-const [trashTask] = useTrashTaskMutation();
+  const [openEdit, setOpenEdit] = useState(false);
+  const [trashTask] = useTrashTaskMutation();
 
-const deleteClicks = (id) => {
-  setSelected(id);
-  setOpenDialog(true);
+  const deleteClicks = (id) => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can delete tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    setSelected(id);
+    setOpenDialog(true);
 
-  setTimeout(() => {
-    setOpenDialog(false);
-  }, 3000);
-};
+    setTimeout(() => {
+      setOpenDialog(false);
+    }, 3000);
+  };
 
-const editTaskHandler = (el) => {
-  setSelected(el);
-  setOpenEdit(true);
-}
+  const editTaskHandler = (el) => {
+    if (!isAdmin) {
+      toast.error("Access denied! Only Admin can edit tasks.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    setSelected(el);
+    setOpenEdit(true);
+  };
 
 
   const deleteHandler = async() => {
