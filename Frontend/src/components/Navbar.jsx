@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useSidebar } from "./ui/sidebar";
 import { MdAddTask } from "react-icons/md";
 import { Search } from "lucide-react";
@@ -21,15 +22,15 @@ function Navbar() {
         ☰
       </button>
 
-      <a
-        href="#"
+      <Link
+        to="/dashboard"
         className="hidden md:flex items-center gap-2 text-2xl"
       >
         <p className="bg-blue-600 p-1 rounded-full">
           <MdAddTask className="text-white text-2xl font-black" />
         </p>
         <span className="text-xl font-semibold">TaskMe</span>
-      </a>
+      </Link>
     </div>
 
     {/* CENTER - SEARCH */}

@@ -131,9 +131,17 @@ const TaskTable = ({ tasks = [] }) => {
       <table className="w-full">
         <TableHeader />
         <tbody>
-          {tasks?.map((task, id) => (
-            <TableRow key={task._id || id} task={task} />
-          ))}
+          {tasks?.length > 0 ? (
+            tasks.map((task, id) => (
+              <TableRow key={task._id || id} task={task} />
+            ))
+          ) : (
+            <tr>
+              <td colSpan="4" className="text-center py-6 text-xs sm:text-sm text-gray-500">
+                No tasks available
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
@@ -196,9 +204,17 @@ const UserTable = ({ users }) => {
       <table className="w-full mb-5">
         <TableHeader />
         <tbody>
-          {users?.map((user, index) => (
-            <TableRow key={index + user?._id} user={user} />
-          ))}
+          {users?.length > 0 ? (
+            users.map((user, index) => (
+              <TableRow key={index + user?._id} user={user} />
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3" className="text-center py-6 text-xs sm:text-sm text-gray-500">
+                No users available
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

@@ -1,4 +1,4 @@
-import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users, TableOfContents, Settings } from "lucide-react";
+import { CircleCheckBig, ClipboardClock, ClipboardCheck, Trash2, Users, TableOfContents, Settings, LayoutDashboard } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { MdDashboard } from "react-icons/md";
@@ -14,6 +14,7 @@ import {
 
 // Menu items — adminOnly: true means only admins can navigate there
 const items = [
+  { title: "Dashboard",   url: "/dashboard",               icon: LayoutDashboard },
   { title: "Tasks",       url: "/tasks",                   icon: TableOfContents },
   { title: "Complete",    url: "/completed/completed",     icon: CircleCheckBig  },
   { title: "In Process",  url: "/in-progress/in progress", icon: ClipboardClock  },
